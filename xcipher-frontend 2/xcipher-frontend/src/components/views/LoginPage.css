@@ -1,0 +1,181 @@
+.login-view {
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  font-family: var(--body);
+}
+
+.login-grid-bg {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(138,43,226, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(138,43,226, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  z-index: 0;
+}
+
+.login-scanner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  box-shadow: 0 0 20px var(--accent-glow);
+  z-index: 5;
+  animation: scan 4s linear infinite;
+  opacity: 0.3;
+}
+
+@keyframes scan {
+  0% { transform: translateY(-100vh); }
+  100% { transform: translateY(100vh); }
+}
+
+.login-card {
+  width: 100%;
+  max-width: 440px;
+  background: rgba(10, 20, 40, 0.8);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(24px);
+  padding: 4rem 3rem;
+  position: relative;
+  z-index: 10;
+  clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
+  box-shadow: 0 40px 100px rgba(0,0,0,0.8), inset 0 0 30px rgba(138,43,226,0.05);
+}
+
+.login-logo-container {
+  width: 64px;
+  height: 64px;
+  background: rgba(138,43,226, 0.08);
+  border: 1px solid var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 2rem;
+  color: var(--primary);
+  filter: drop-shadow(0 0 15px var(--primary-glow));
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+}
+
+.login-header h1 {
+  font-family: var(--display);
+  font-size: 3rem;
+  color: var(--text);
+  letter-spacing: 0.06em;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.login-header p {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text2);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 3rem;
+}
+
+.login-field {
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.login-field label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.login-input-wrapper {
+  position: relative;
+}
+
+.login-input-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text3);
+  transition: color 0.3s;
+}
+
+.login-input {
+  width: 100%;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  padding: 14px 14px 14px 44px;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 13px;
+  transition: all 0.3s;
+  outline: none;
+}
+
+.login-input:focus {
+  border-color: var(--primary);
+  background: rgba(138,43,226, 0.04);
+  box-shadow: 0 0 20px rgba(138,43,226, 0.1);
+}
+
+.login-input:focus + .login-input-icon {
+  color: var(--primary);
+}
+
+.login-submit-btn {
+  width: 100%;
+  padding: 16px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin-top: 1rem;
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  box-shadow: 0 0 30px var(--primary-glow);
+  transition: all 0.3s;
+}
+
+.login-submit-btn:hover {
+  background: var(--accent);
+  color: #000;
+  box-shadow: 0 0 40px var(--accent-glow);
+}
+
+.login-back-btn {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  padding: 8px 16px;
+  font-family: var(--mono);
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+}
+
+.login-back-btn:hover {
+  background: rgba(255,255,255,0.08);
+  color: var(--text);
+  border-color: var(--text2);
+}

@@ -1,0 +1,214 @@
+.architecture-section {
+  position: relative;
+  z-index: 10;
+  padding: 120px 0;
+  background: var(--bg);
+}
+
+.arch-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 4rem;
+}
+
+.arch-header {
+  margin-bottom: 4rem;
+  border-left: 2px solid var(--primary);
+  padding-left: 2rem;
+}
+
+.arch-header .eyebrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--primary);
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 0;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.arch-header .eyebrow-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--primary);
+  border-radius: 0;
+  animation: none;
+  box-shadow: 0 0 8px var(--primary);
+}
+
+.arch-title {
+  font-family: var(--display);
+  font-size: clamp(36px, 5vw, 60px);
+  color: var(--text);
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.arch-desc {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text2);
+  max-width: 600px;
+  line-height: 1.7;
+}
+
+/* System node diagram layout */
+.arch-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  position: relative;
+}
+
+/* Central crosshair connectors */
+.arch-grid::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 60px;
+  height: 60px;
+  transform: translate(-50%, -50%);
+  border: 1px solid var(--primary);
+  border-radius: 50%;
+  z-index: 1;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.arch-card {
+  background: rgba(10, 15, 25, 0.6);
+  border: 1px solid rgba(138,43,226, 0.12);
+  padding: 2.5rem;
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  position: relative;
+  overflow: hidden;
+  cursor: none;
+  clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
+}
+
+.arch-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Scanning line animation */
+.arch-card::after {
+  content: '';
+  position: absolute;
+  top: -100%;
+  left: 0;
+  width: 100%;
+  height: 30%;
+  background: linear-gradient(to bottom, transparent, rgba(138,43,226,0.04), transparent);
+  pointer-events: none;
+  animation: card-scan 5s linear infinite;
+}
+
+@keyframes card-scan {
+  0% { top: -100%; }
+  100% { top: 200%; }
+}
+
+.arch-card:hover {
+  background: rgba(10, 15, 25, 0.9);
+  border-color: rgba(138,43,226, 0.35);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 0 30px rgba(138,43,226,0.06);
+}
+
+.arch-card:hover::before {
+  opacity: 1;
+}
+
+/* Node ID tag */
+.arch-card-id {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text3);
+  letter-spacing: 0.15em;
+  margin-bottom: 1.5rem;
+}
+
+.card-icon {
+  width: 44px;
+  height: 44px;
+  background: rgba(138,43,226, 0.06);
+  border: 1px solid rgba(138,43,226, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  margin-bottom: 1.5rem;
+  transition: all 0.3s;
+  /* Chamfered icon box */
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+}
+
+.arch-card:hover .card-icon {
+  background: rgba(138,43,226, 0.15);
+  box-shadow: 0 0 20px rgba(138,43,226,0.3);
+}
+
+.card-title {
+  font-family: var(--display);
+  font-size: 22px;
+  color: var(--text);
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.card-desc {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.8;
+}
+
+/* Status indicator */
+.arch-card-status {
+  position: absolute;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.arch-card-status::before {
+  content: '';
+  width: 4px;
+  height: 4px;
+  background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--accent);
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+@media (max-width: 900px) {
+  .arch-grid {
+    grid-template-columns: 1fr;
+  }
+  .arch-container {
+    padding: 0 2rem;
+  }
+}

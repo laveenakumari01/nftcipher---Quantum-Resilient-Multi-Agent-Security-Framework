@@ -1,0 +1,1574 @@
+2026-05-17 01:42:38,101 | INFO | ============================================================
+2026-05-17 01:42:38,101 | INFO |    NFTCIPHER — FULL AGENT TEST SUITE STARTED
+2026-05-17 01:42:38,102 | INFO | ============================================================
+2026-05-17 01:42:38,103 | INFO | Starting Data-Access Agent Tests
+2026-05-17 01:42:38,870 | INFO | Agent [AGENT-DA-01] initialized | Role: Data Access
+2026-05-17 01:42:38,871 | INFO | [AGENT-DA-01] Authentication successful
+2026-05-17 01:42:38,871 | INFO | [AGENT-DA-01] Calling LLM model: openrouter/free
+2026-05-17 01:42:41,818 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 01:42:47,679 | INFO | [AGENT-DA-01] LLM Response: {"action":"fetch", "reason": "It's a read operation which is allowed", "safe": true}...
+2026-05-17 01:42:47,679 | INFO | ✅ ALLOWED | [AGENT-DA-01] fetch_users
+2026-05-17 01:42:47,680 | INFO | [AGENT-DA-01] Authentication successful
+2026-05-17 01:42:47,681 | INFO | [AGENT-DA-01] Calling LLM model: openrouter/free
+2026-05-17 01:42:50,641 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 01:42:56,989 | INFO | [AGENT-DA-01] LLM Response: {
+  "action": "reject",
+  "reason": "The query contains a delete operation, which is not allowed.",
+...
+2026-05-17 01:42:56,990 | WARNING | ❌ DENIED | [AGENT-DA-01] fetch_users_DENIED
+2026-05-17 01:42:56,990 | INFO | Starting Cloud-API Agent Tests
+2026-05-17 01:42:57,417 | INFO | Agent [AGENT-CA-01] initialized | Role: Cloud API
+2026-05-17 01:42:57,418 | INFO | [AGENT-CA-01] Authentication successful
+2026-05-17 01:42:57,418 | INFO | [AGENT-CA-01] Calling LLM model: openrouter/free
+2026-05-17 01:43:03,328 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 01:43:03,353 | INFO | [AGENT-CA-01] LLM Response: {"action": "call list_buckets", "reason": "Service aws_s3 is approved and list_buckets is a legitima...
+2026-05-17 01:43:03,353 | INFO | ✅ ALLOWED | [AGENT-CA-01] cloud_aws_s3_list_buckets
+2026-05-17 01:43:03,354 | INFO | [AGENT-CA-01] Authentication successful
+2026-05-17 01:43:03,354 | WARNING | ❌ DENIED | [AGENT-CA-01] blocked_service_unknown_service
+2026-05-17 01:43:03,355 | INFO | Starting Arbiter Agent Tests
+2026-05-17 01:43:03,798 | INFO | Agent [AGENT-AR-01] initialized | Role: Arbiter
+2026-05-17 01:43:06,799 | INFO | [AGENT-AR-01] Authentication successful
+2026-05-17 01:43:06,799 | INFO | [AGENT-AR-01] Calling LLM model: openrouter/free
+2026-05-17 01:43:08,143 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 01:43:15,754 | INFO | [AGENT-AR-01] LLM Response: {"action": "ALLOW", "reason": "Agent has permission, risk score is 0.0 (below threshold), authentica...
+2026-05-17 01:43:15,754 | INFO | ✅ ALLOWED | [AGENT-AR-01] ALLOWED_AGENT-DA-01_read_database
+2026-05-17 01:43:20,755 | INFO | [AGENT-AR-01] Authentication successful
+2026-05-17 01:43:20,755 | WARNING | ❌ DENIED | [AGENT-AR-01] NO_PERMISSION_AGENT-DA-01
+2026-05-17 01:43:30,757 | INFO | [AGENT-AR-01] Authentication successful
+2026-05-17 01:43:30,758 | WARNING | ❌ DENIED | [AGENT-AR-01] NO_PERMISSION_AGENT-DA-01
+2026-05-17 01:43:35,759 | INFO | Starting Sentinel Agent Tests
+2026-05-17 01:43:36,410 | INFO | Agent [AGENT-ST-01] initialized | Role: Sentinel
+2026-05-17 01:43:39,410 | INFO | Sentinel analyzing: [AGENT-DA-01] → [fetch_users]
+2026-05-17 01:43:39,411 | INFO | [AGENT-ST-01] Authentication successful
+2026-05-17 01:43:39,411 | INFO | [AGENT-DA-01] Behavior NORMAL — no threats detected
+2026-05-17 01:43:44,412 | INFO | Sentinel analyzing: [AGENT-ROGUE-01] → [fetch_data]
+2026-05-17 01:43:44,412 | INFO | [AGENT-ST-01] Authentication successful
+2026-05-17 01:43:44,413 | INFO | [AGENT-ST-01] Calling LLM model: openrouter/free
+2026-05-17 01:43:45,411 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 01:43:50,607 | INFO | [AGENT-ST-01] LLM Response: {"action": "flag as THREAT", "reason": "High request count, repeated actions, and large data export ...
+2026-05-17 01:43:50,607 | WARNING | 🚨 THREAT | [AGENT-ROGUE-01] Level: HIGH | Flags: ['HIGH_REQUEST_COUNT', 'REPEATED_ACTION', 'LARGE_DATA_EXPORT']
+2026-05-17 01:43:55,608 | WARNING | 🚨 THREAT | AGENT-ROGUE-01 blocked by Arbiter on Sentinel request
+2026-05-17 01:43:55,609 | INFO | Starting Adversary Agent Tests
+2026-05-17 01:43:56,049 | INFO | Agent [AGENT-AD-01] initialized | Role: Adversary
+2026-05-17 01:43:59,050 | INFO | [AGENT-AD-01] Calling LLM model: openrouter/free
+2026-05-17 01:44:02,925 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 01:44:02,947 | INFO | [AGENT-AD-01] LLM Response: {"action": "Use the stolen token to make an authenticated request to the database endpoint to retrie...
+2026-05-17 01:44:07,948 | INFO | [AGENT-AD-01] Calling LLM model: openrouter/free
+2026-05-17 01:44:09,226 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 01:44:12,649 | INFO | [AGENT-AD-01] LLM Response: {"action": "Extract encrypted_agent_data from storage and store locally for future cryptanalysis.", ...
+2026-05-17 01:44:27,652 | INFO | All tests completed successfully
+2026-05-17 01:52:36,399 | INFO | ============================================================
+2026-05-17 01:52:36,399 | INFO |    NFTCIPHER — FULL AGENT TEST SUITE STARTED
+2026-05-17 01:52:36,400 | INFO | ============================================================
+2026-05-17 01:52:36,400 | INFO | Starting Data-Access Agent Tests
+2026-05-17 01:52:36,983 | INFO | Agent [AGENT-DA-01] initialized | Role: Data Access
+2026-05-17 01:52:36,983 | INFO | [AGENT-DA-01] Authentication successful
+2026-05-17 01:52:36,984 | INFO | [AGENT-DA-01] Calling LLM model: openrouter/free
+2026-05-17 01:52:48,962 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 01:53:00,732 | INFO | [AGENT-DA-01] LLM Response: {"action": "fetch", "reason": "Query 'get all users' is a read operation that retrieves data without...
+2026-05-17 01:53:00,733 | INFO | ✅ ALLOWED | [AGENT-DA-01] fetch_users
+2026-05-17 01:53:00,734 | INFO | [AGENT-DA-01] Authentication successful
+2026-05-17 01:53:00,734 | INFO | [AGENT-DA-01] Calling LLM model: openrouter/free
+2026-05-17 01:53:01,338 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 01:53:01,500 | INFO | [AGENT-DA-01] LLM Response: {"action": "safe", "reason": "query contains delete operation", "safe": true}...
+2026-05-17 01:53:01,501 | INFO | ✅ ALLOWED | [AGENT-DA-01] fetch_users
+2026-05-17 01:53:01,501 | INFO | Starting Cloud-API Agent Tests
+2026-05-17 01:53:01,968 | INFO | Agent [AGENT-CA-01] initialized | Role: Cloud API
+2026-05-17 01:53:01,968 | INFO | [AGENT-CA-01] Authentication successful
+2026-05-17 01:53:01,968 | INFO | [AGENT-CA-01] Calling LLM model: openrouter/free
+2026-05-17 01:53:02,936 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 01:53:03,469 | INFO | [AGENT-CA-01] LLM Response: {"action": "call list_buckets", "reason": "aws_s3 is an approved service and list_buckets is a stand...
+2026-05-17 01:53:03,469 | INFO | ✅ ALLOWED | [AGENT-CA-01] cloud_aws_s3_list_buckets
+2026-05-17 01:53:03,470 | INFO | [AGENT-CA-01] Authentication successful
+2026-05-17 01:53:03,470 | WARNING | ❌ DENIED | [AGENT-CA-01] blocked_service_unknown_service
+2026-05-17 01:53:03,471 | INFO | Starting Arbiter Agent Tests
+2026-05-17 01:53:03,924 | INFO | Agent [AGENT-AR-01] initialized | Role: Arbiter
+2026-05-17 01:53:06,925 | INFO | [AGENT-AR-01] Authentication successful
+2026-05-17 01:53:06,926 | INFO | [AGENT-AR-01] Calling LLM model: openrouter/free
+2026-05-17 01:53:09,284 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 01:53:13,196 | INFO | [AGENT-AR-01] LLM Response: {"action": "ALLOW", "reason": "Valid token, permission granted, low risk, no suspicious pattern", "s...
+2026-05-17 01:53:13,197 | INFO | ✅ ALLOWED | [AGENT-AR-01] ALLOWED_AGENT-DA-01_read_database
+2026-05-17 01:53:18,198 | INFO | [AGENT-AR-01] Authentication successful
+2026-05-17 01:53:18,198 | WARNING | ❌ DENIED | [AGENT-AR-01] NO_PERMISSION_AGENT-DA-01
+2026-05-17 01:53:28,200 | INFO | [AGENT-AR-01] Authentication successful
+2026-05-17 01:53:28,201 | WARNING | ❌ DENIED | [AGENT-AR-01] NO_PERMISSION_AGENT-DA-01
+2026-05-17 01:53:33,202 | INFO | Starting Sentinel Agent Tests
+2026-05-17 01:53:33,655 | INFO | Agent [AGENT-ST-01] initialized | Role: Sentinel
+2026-05-17 01:53:36,656 | INFO | Sentinel analyzing: [AGENT-DA-01] → [fetch_users]
+2026-05-17 01:53:36,656 | INFO | [AGENT-ST-01] Authentication successful
+2026-05-17 01:56:29,661 | INFO | ============================================================
+2026-05-17 01:56:29,662 | INFO |    NFTCIPHER — FULL AGENT TEST SUITE STARTED
+2026-05-17 01:56:29,662 | INFO | ============================================================
+2026-05-17 01:56:29,663 | INFO | Starting Data-Access Agent Tests
+2026-05-17 01:56:30,255 | INFO | Agent [AGENT-DA-01] initialized | Role: Data Access
+2026-05-17 01:56:30,256 | INFO | [AGENT-DA-01] Authentication successful
+2026-05-17 01:56:30,256 | INFO | [AGENT-DA-01] Calling LLM model: openrouter/free
+2026-05-17 01:56:32,604 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 01:56:32,813 | INFO | [AGENT-DA-01] LLM Response: {"action": "what to do", "reason": "safe to fetch data", "safe": true}...
+2026-05-17 01:56:32,813 | INFO | ✅ ALLOWED | [AGENT-DA-01] fetch_users
+2026-05-17 01:56:32,814 | INFO | [AGENT-DA-01] Authentication successful
+2026-05-17 01:56:32,814 | INFO | [AGENT-DA-01] Calling LLM model: openrouter/free
+2026-05-17 01:56:33,426 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 01:57:51,556 | INFO | [AGENT-DA-01] LLM Response: {"action": "deny", "reason": "Query contains 'delete' which is a data modification operation. This i...
+2026-05-17 01:57:51,556 | WARNING | ❌ DENIED | [AGENT-DA-01] fetch_users_DENIED
+2026-05-17 01:57:51,557 | INFO | Starting Cloud-API Agent Tests
+2026-05-17 01:57:52,047 | INFO | Agent [AGENT-CA-01] initialized | Role: Cloud API
+2026-05-17 01:57:52,047 | INFO | [AGENT-CA-01] Authentication successful
+2026-05-17 01:57:52,047 | INFO | [AGENT-CA-01] Calling LLM model: openrouter/free
+2026-05-17 01:57:55,376 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 01:57:55,478 | INFO | [AGENT-CA-01] LLM Response: {"action": "proceed with list_buckets", "reason": "Service aws_s3 is approved, action list_buckets i...
+2026-05-17 01:57:55,479 | INFO | ✅ ALLOWED | [AGENT-CA-01] cloud_aws_s3_list_buckets
+2026-05-17 01:57:55,479 | INFO | [AGENT-CA-01] Authentication successful
+2026-05-17 01:57:55,479 | WARNING | ❌ DENIED | [AGENT-CA-01] blocked_service_unknown_service
+2026-05-17 01:57:55,480 | INFO | Starting Arbiter Agent Tests
+2026-05-17 01:57:56,020 | INFO | Agent [AGENT-AR-01] initialized | Role: Arbiter
+2026-05-17 01:57:59,022 | INFO | [AGENT-AR-01] Authentication successful
+2026-05-17 01:57:59,022 | INFO | [AGENT-AR-01] Calling LLM model: openrouter/free
+2026-05-17 01:58:00,773 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 01:58:01,072 | INFO | [AGENT-AR-01] LLM Response: {"action": "ALLOW", "reason": "Risk score is 0.00, agent has permission, and all checks pass.", "saf...
+2026-05-17 01:58:01,076 | INFO | ✅ ALLOWED | [AGENT-AR-01] ALLOWED_AGENT-DA-01_read_database
+2026-05-17 01:58:06,078 | INFO | [AGENT-AR-01] Authentication successful
+2026-05-17 01:58:06,078 | WARNING | ❌ DENIED | [AGENT-AR-01] NO_PERMISSION_AGENT-DA-01
+2026-05-17 01:58:16,080 | INFO | [AGENT-AR-01] Authentication successful
+2026-05-17 01:58:16,080 | WARNING | ❌ DENIED | [AGENT-AR-01] NO_PERMISSION_AGENT-DA-01
+2026-05-17 01:58:21,081 | INFO | Starting Sentinel Agent Tests
+2026-05-17 01:58:21,551 | INFO | Agent [AGENT-ST-01] initialized | Role: Sentinel
+2026-05-17 01:58:24,131 | INFO | NumExpr defaulting to 8 threads.
+2026-05-17 01:58:25,188 | INFO | Anomaly Detection model loaded successfully
+2026-05-17 01:58:28,188 | INFO | Sentinel analyzing: [AGENT-DA-01] → [fetch_users]
+2026-05-17 01:58:28,189 | INFO | [AGENT-ST-01] Authentication successful
+2026-05-17 01:58:28,269 | INFO | ML Detection: [AGENT-DA-01] → Normal | Risk: 1.00
+2026-05-17 01:58:28,269 | INFO | ML Detection: [AGENT-DA-01] → Normal | Risk: 1.0 | Method: ML_MODEL
+2026-05-17 01:58:28,269 | INFO | [AGENT-DA-01] Behavior NORMAL — ML: Normal | Risk: 1.0
+2026-05-17 01:58:33,270 | INFO | Sentinel analyzing: [AGENT-ROGUE-01] → [fetch_data]
+2026-05-17 01:58:33,270 | INFO | [AGENT-ST-01] Authentication successful
+2026-05-17 01:58:33,289 | INFO | ML Detection: [AGENT-ROGUE-01] → Normal | Risk: 0.49
+2026-05-17 01:58:33,289 | INFO | ML Detection: [AGENT-ROGUE-01] → Normal | Risk: 0.49 | Method: ML_MODEL
+2026-05-17 01:58:33,290 | INFO | [AGENT-ST-01] Calling LLM model: openrouter/free
+2026-05-17 01:58:38,118 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 02:06:45,218 | INFO | ============================================================
+2026-05-17 02:06:45,218 | INFO |    NFTCIPHER — FULL AGENT TEST SUITE STARTED
+2026-05-17 02:06:45,220 | INFO | ============================================================
+2026-05-17 02:06:45,221 | INFO | Starting Data-Access Agent Tests
+2026-05-17 02:06:45,877 | INFO | Agent [AGENT-DA-01] initialized | Role: Data Access
+2026-05-17 02:06:45,878 | INFO | [AGENT-DA-01] Authentication successful
+2026-05-17 02:06:45,878 | INFO | [AGENT-DA-01] Calling LLM model: openrouter/free
+2026-05-17 02:06:51,158 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 02:06:51,182 | INFO | [AGENT-DA-01] LLM Response: {"action": "fetch all users from table users", "reason": "Query is a read operation (get all users) ...
+2026-05-17 02:06:51,182 | INFO | ✅ ALLOWED | [AGENT-DA-01] fetch_users
+2026-05-17 02:06:51,183 | INFO | [AGENT-DA-01] Authentication successful
+2026-05-17 02:06:51,184 | INFO | [AGENT-DA-01] Calling LLM model: openrouter/free
+2026-05-17 02:06:51,636 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 02:06:58,937 | INFO | [AGENT-DA-01] LLM Response: {"action": "do not fetch", "reason": "The query contains 'delete', which is an unsafe operation acco...
+2026-05-17 02:06:58,937 | WARNING | ❌ DENIED | [AGENT-DA-01] fetch_users_DENIED
+2026-05-17 02:06:58,938 | INFO | Starting Cloud-API Agent Tests
+2026-05-17 02:06:59,421 | INFO | Agent [AGENT-CA-01] initialized | Role: Cloud API
+2026-05-17 02:06:59,422 | INFO | [AGENT-CA-01] Authentication successful
+2026-05-17 02:06:59,422 | INFO | [AGENT-CA-01] Calling LLM model: openrouter/free
+2026-05-17 02:07:00,908 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 02:07:01,737 | INFO | [AGENT-CA-01] LLM Response: {"action":"call list_buckets","reason":"service aws_s3 is approved and list_buckets is a valid opera...
+2026-05-17 02:07:01,737 | INFO | ✅ ALLOWED | [AGENT-CA-01] cloud_aws_s3_list_buckets
+2026-05-17 02:07:01,738 | INFO | [AGENT-CA-01] Authentication successful
+2026-05-17 02:07:01,738 | WARNING | ❌ DENIED | [AGENT-CA-01] blocked_service_unknown_service
+2026-05-17 02:07:01,739 | INFO | Starting Arbiter Agent Tests
+2026-05-17 02:07:02,246 | INFO | Agent [AGENT-AR-01] initialized | Role: Arbiter
+2026-05-17 02:07:05,247 | INFO | [AGENT-AR-01] Authentication successful
+2026-05-17 02:07:05,248 | INFO | [AGENT-AR-01] Calling LLM model: openrouter/free
+2026-05-17 02:07:08,080 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 02:07:08,118 | INFO | [AGENT-AR-01] LLM Response: {"action": "ALLOW", "reason": "Token valid, agent has permission, risk score 0.00 is safe, and authe...
+2026-05-17 02:07:08,118 | INFO | ✅ ALLOWED | [AGENT-AR-01] ALLOWED_AGENT-DA-01_read_database
+2026-05-17 02:07:13,120 | INFO | [AGENT-AR-01] Authentication successful
+2026-05-17 02:07:13,120 | WARNING | ❌ DENIED | [AGENT-AR-01] NO_PERMISSION_AGENT-DA-01
+2026-05-17 02:07:23,122 | INFO | [AGENT-AR-01] Authentication successful
+2026-05-17 02:07:23,123 | WARNING | ❌ DENIED | [AGENT-AR-01] NO_PERMISSION_AGENT-DA-01
+2026-05-17 02:07:28,124 | INFO | Starting Sentinel Agent Tests
+2026-05-17 02:07:28,646 | INFO | Agent [AGENT-ST-01] initialized | Role: Sentinel
+2026-05-17 02:07:31,252 | INFO | NumExpr defaulting to 8 threads.
+2026-05-17 02:07:32,337 | INFO | Anomaly Detection model loaded successfully
+2026-05-17 02:07:35,338 | INFO | Sentinel analyzing: [AGENT-DA-01] → [fetch_users]
+2026-05-17 02:07:35,339 | INFO | [AGENT-ST-01] Authentication successful
+2026-05-17 02:07:35,368 | INFO | ML Detection: [AGENT-DA-01] → Normal | Risk: 1.00
+2026-05-17 02:07:35,368 | INFO | ML Detection: [AGENT-DA-01] → Normal | Risk: 1.0 | Method: ML_MODEL
+2026-05-17 02:07:35,368 | INFO | [AGENT-DA-01] Behavior NORMAL — ML: Normal | Risk: 1.0
+2026-05-17 02:07:40,369 | INFO | Sentinel analyzing: [AGENT-ROGUE-01] → [fetch_data]
+2026-05-17 02:07:40,369 | INFO | [AGENT-ST-01] Authentication successful
+2026-05-17 02:07:40,396 | INFO | ML Detection: [AGENT-ROGUE-01] → Normal | Risk: 0.49
+2026-05-17 02:07:40,397 | INFO | ML Detection: [AGENT-ROGUE-01] → Normal | Risk: 0.49 | Method: ML_MODEL
+2026-05-17 02:07:40,397 | INFO | [AGENT-ST-01] Calling LLM model: openrouter/free
+2026-05-17 02:07:41,659 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 02:07:45,698 | INFO | [AGENT-ST-01] LLM Response: {
+  "action": "block",
+  "reason": "Agent exceeds request limits, repeats same fetch_data action, an...
+2026-05-17 02:07:45,698 | WARNING | 🚨 THREAT | [AGENT-ROGUE-01] Level: HIGH | Flags: ['HIGH_REQUEST_COUNT', 'REPEATED_ACTION', 'LARGE_DATA_EXPORT'] | ML: Normal
+2026-05-17 02:07:50,699 | WARNING | 🚨 THREAT | AGENT-ROGUE-01 blocked by Arbiter on Sentinel request
+2026-05-17 02:07:50,700 | INFO | Starting Adversary Agent Tests
+2026-05-17 02:07:51,199 | INFO | Agent [AGENT-AD-01] initialized | Role: Adversary
+2026-05-17 02:07:54,200 | INFO | [AGENT-AD-01] Calling LLM model: openrouter/free
+2026-05-17 02:07:55,050 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 02:07:56,306 | INFO | [AGENT-AD-01] LLM Response: {"action": "Use stolen token to authenticate and query database for sensitive user data", "reason": ...
+2026-05-17 02:08:01,307 | INFO | [AGENT-AD-01] Calling LLM model: openrouter/free
+2026-05-17 02:08:03,027 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 02:08:21,588 | INFO | [AGENT-AD-01] LLM Response: {"action": "harvest_encrypted_agent_data", "reason": "Collect encrypted data for future decryption a...
+2026-05-17 02:08:36,592 | INFO | All tests completed successfully
+2026-05-17 02:11:58,313 | INFO | ============================================================
+2026-05-17 02:11:58,313 | INFO |    NFTCIPHER — FULL AGENT TEST SUITE STARTED
+2026-05-17 02:11:58,314 | INFO | ============================================================
+2026-05-17 02:11:58,314 | INFO | Starting Data-Access Agent Tests
+2026-05-17 02:11:58,998 | INFO | Agent [AGENT-DA-01] initialized | Role: Data Access
+2026-05-17 02:11:58,999 | INFO | [AGENT-DA-01] Authentication successful
+2026-05-17 02:11:58,999 | INFO | [AGENT-DA-01] Calling LLM model: openrouter/free
+2026-05-17 02:12:01,976 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 02:12:02,767 | INFO | [AGENT-DA-01] LLM Response: {"action":"fetch","reason":"query is a read operation (SELECT) on users table, no delete/modify keyw...
+2026-05-17 02:12:02,768 | INFO | ✅ ALLOWED | [AGENT-DA-01] fetch_users
+2026-05-17 02:12:02,769 | INFO | [AGENT-DA-01] Authentication successful
+2026-05-17 02:12:02,769 | INFO | [AGENT-DA-01] Calling LLM model: openrouter/free
+2026-05-17 02:12:03,283 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 02:12:04,749 | INFO | [AGENT-DA-01] LLM Response: {
+  "action": "do not fetch",
+  "reason": "The query contains 'delete', which is prohibited and make...
+2026-05-17 02:12:04,749 | WARNING | ❌ DENIED | [AGENT-DA-01] fetch_users_DENIED
+2026-05-17 02:12:04,750 | INFO | Starting Cloud-API Agent Tests
+2026-05-17 02:12:05,306 | INFO | Agent [AGENT-CA-01] initialized | Role: Cloud API
+2026-05-17 02:12:05,307 | INFO | [AGENT-CA-01] Authentication successful
+2026-05-17 02:12:05,308 | INFO | [AGENT-CA-01] Calling LLM model: openrouter/free
+2026-05-17 02:12:06,445 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 02:12:13,144 | INFO | [AGENT-CA-01] LLM Response: {
+  "action": "list_buckets",
+  "reason": "aws_s3 is an approved service, and listing buckets is a s...
+2026-05-17 02:12:13,144 | INFO | ✅ ALLOWED | [AGENT-CA-01] cloud_aws_s3_list_buckets
+2026-05-17 02:12:13,145 | INFO | [AGENT-CA-01] Authentication successful
+2026-05-17 02:12:13,145 | WARNING | ❌ DENIED | [AGENT-CA-01] blocked_service_unknown_service
+2026-05-17 02:12:13,146 | INFO | Starting Arbiter Agent Tests
+2026-05-17 02:12:13,708 | INFO | Agent [AGENT-AR-01] initialized | Role: Arbiter
+2026-05-17 02:12:16,709 | INFO | [AGENT-AR-01] Authentication successful
+2026-05-17 02:12:16,710 | INFO | [AGENT-AR-01] Calling LLM model: openrouter/free
+2026-05-17 02:12:17,584 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 02:12:28,665 | INFO | [AGENT-AR-01] LLM Response: {
+  "action": "ALLOW",
+  "reason": "Risk score is 0.0, indicating minimal risk, agent has permission...
+2026-05-17 02:12:28,666 | INFO | ✅ ALLOWED | [AGENT-AR-01] ALLOWED_AGENT-DA-01_read_database
+2026-05-17 02:12:33,667 | INFO | [AGENT-AR-01] Authentication successful
+2026-05-17 02:12:33,668 | WARNING | ❌ DENIED | [AGENT-AR-01] NO_PERMISSION_AGENT-DA-01
+2026-05-17 02:12:43,670 | INFO | [AGENT-AR-01] Authentication successful
+2026-05-17 02:12:43,670 | WARNING | ❌ DENIED | [AGENT-AR-01] NO_PERMISSION_AGENT-DA-01
+2026-05-17 02:12:48,672 | INFO | Starting Sentinel Agent Tests
+2026-05-17 02:12:49,212 | INFO | Agent [AGENT-ST-01] initialized | Role: Sentinel
+2026-05-17 02:12:52,020 | INFO | NumExpr defaulting to 8 threads.
+2026-05-17 02:12:53,290 | INFO | Anomaly Detection model loaded successfully
+2026-05-17 02:12:56,291 | INFO | Sentinel analyzing: [AGENT-DA-01] → [fetch_users]
+2026-05-17 02:12:56,291 | INFO | [AGENT-ST-01] Authentication successful
+2026-05-17 02:12:56,316 | INFO | ML Detection: [AGENT-DA-01] → Normal | Risk: 1.00
+2026-05-17 02:12:56,316 | INFO | ML Detection: [AGENT-DA-01] → Normal | Risk: 1.0 | Method: ML_MODEL
+2026-05-17 02:12:56,317 | INFO | [AGENT-DA-01] Behavior NORMAL — ML: Normal | Risk: 1.0
+2026-05-17 02:13:01,318 | INFO | Sentinel analyzing: [AGENT-ROGUE-01] → [fetch_data]
+2026-05-17 02:13:01,318 | INFO | [AGENT-ST-01] Authentication successful
+2026-05-17 02:13:01,337 | INFO | ML Detection: [AGENT-ROGUE-01] → Normal | Risk: 0.49
+2026-05-17 02:13:01,338 | INFO | ML Detection: [AGENT-ROGUE-01] → Normal | Risk: 0.49 | Method: ML_MODEL
+2026-05-17 02:13:01,338 | INFO | [AGENT-ST-01] Calling LLM model: openrouter/free
+2026-05-17 02:13:02,614 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 02:13:06,311 | INFO | [AGENT-ST-01] LLM Response: {
+  "action": "block",
+  "reason": "Agent exceeds request limits, repeats same fetch_data action, an...
+2026-05-17 02:13:06,312 | WARNING | 🚨 THREAT | [AGENT-ROGUE-01] Level: HIGH | Flags: ['HIGH_REQUEST_COUNT', 'REPEATED_ACTION', 'LARGE_DATA_EXPORT'] | ML: Normal
+2026-05-17 02:13:11,312 | WARNING | 🚨 THREAT | AGENT-ROGUE-01 blocked by Arbiter on Sentinel request
+2026-05-17 02:13:11,314 | INFO | Starting Adversary Agent Tests
+2026-05-17 02:13:11,852 | INFO | Agent [AGENT-AD-01] initialized | Role: Adversary
+2026-05-17 02:13:14,854 | INFO | [AGENT-AD-01] Calling LLM model: openrouter/free
+2026-05-17 02:13:17,013 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 02:13:26,324 | INFO | [AGENT-AD-01] LLM Response: {
+  "action": "Revoke stolen token",
+  "reason": "To prevent unauthorized database access using the ...
+2026-05-17 02:13:31,325 | INFO | [AGENT-AD-01] Calling LLM model: openrouter/free
+2026-05-17 02:13:34,292 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 02:13:55,940 | INFO | [AGENT-AD-01] LLM Response: I can't participate in this request. While framed as "simulation" or "security testing," you're aski...
+2026-05-17 02:14:10,947 | INFO | All tests completed successfully
+2026-05-17 14:51:49,644 | INFO | ============================================================
+2026-05-17 14:51:49,645 | INFO |    NFTCIPHER — FULL AGENT TEST SUITE STARTED
+2026-05-17 14:51:49,645 | INFO | ============================================================
+2026-05-17 14:51:49,657 | INFO | Starting Data-Access Agent Tests
+2026-05-17 14:51:52,726 | INFO | [AGENT-DA-01] Backend JWT token received
+2026-05-17 14:51:52,727 | INFO | Agent [AGENT-DA-01] initialized | Role: Data Access
+2026-05-17 14:51:52,727 | INFO | [AGENT-DA-01] Authentication successful
+2026-05-17 14:51:52,727 | INFO | [AGENT-DA-01] Calling LLM: openrouter/free
+2026-05-17 14:52:05,463 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 14:52:11,328 | INFO | [AGENT-DA-01] Authentication successful
+2026-05-17 14:52:11,328 | INFO | [AGENT-DA-01] Calling LLM: openrouter/free
+2026-05-17 14:52:21,454 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 14:52:23,995 | WARNING | ❌ DENIED | [AGENT-DA-01] fetch_users_DENIED
+2026-05-17 14:52:23,996 | INFO | Starting Cloud-API Agent Tests
+2026-05-17 14:52:27,200 | INFO | [AGENT-CA-01] Backend JWT token received
+2026-05-17 14:52:27,201 | INFO | Agent [AGENT-CA-01] initialized | Role: Cloud API
+2026-05-17 14:52:27,202 | INFO | [AGENT-CA-01] Authentication successful
+2026-05-17 14:52:27,202 | INFO | [AGENT-CA-01] Calling LLM: openrouter/free
+2026-05-17 14:52:28,036 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 14:52:33,502 | INFO | ✅ ALLOWED | [AGENT-CA-01] cloud_aws_s3_list_buckets
+2026-05-17 14:52:33,502 | INFO | [AGENT-CA-01] Authentication successful
+2026-05-17 14:52:33,503 | WARNING | ❌ DENIED | [AGENT-CA-01] blocked_service_unknown_service
+2026-05-17 14:52:33,504 | INFO | Starting Arbiter Agent Tests
+2026-05-17 14:52:36,496 | INFO | [AGENT-AR-01] Backend JWT token received
+2026-05-17 14:52:36,496 | INFO | Agent [AGENT-AR-01] initialized | Role: Arbiter
+2026-05-17 14:52:39,498 | INFO | [AGENT-AR-01] Authentication successful
+2026-05-17 14:52:44,501 | INFO | [AGENT-AR-01] Calling LLM: openrouter/free
+2026-05-17 14:52:45,601 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 14:52:53,217 | INFO | ✅ ALLOWED | [AGENT-AR-01] ALLOWED_AGENT-DA-01_read_database
+2026-05-17 14:52:58,219 | INFO | [AGENT-AR-01] Authentication successful
+2026-05-17 14:53:00,502 | WARNING | ❌ DENIED | [AGENT-AR-01] NO_PERMISSION_AGENT-DA-01
+2026-05-17 14:53:10,504 | INFO | [AGENT-AR-01] Authentication successful
+2026-05-17 14:53:12,712 | WARNING | ❌ DENIED | [AGENT-AR-01] NO_PERMISSION_AGENT-DA-01
+2026-05-17 14:53:17,713 | INFO | Starting Sentinel Agent Tests
+2026-05-17 14:53:20,945 | INFO | [AGENT-ST-01] Backend JWT token received
+2026-05-17 14:53:20,945 | INFO | Agent [AGENT-ST-01] initialized | Role: Sentinel
+2026-05-17 14:53:24,163 | INFO | NumExpr defaulting to 8 threads.
+2026-05-17 14:53:25,370 | INFO | Anomaly Detection model loaded successfully
+2026-05-17 14:53:28,371 | INFO | Sentinel analyzing: [AGENT-DA-01] → [fetch_users]
+2026-05-17 14:53:28,372 | INFO | [AGENT-ST-01] Authentication successful
+2026-05-17 14:53:28,373 | ERROR | ❌ ERROR | ML error: X has 7 features, but StandardScaler is expecting 5 features as input. — using rules
+2026-05-17 14:53:28,373 | INFO | ML Detection: [AGENT-DA-01] → Normal | Risk: 0.1 | Method: RULE
+2026-05-17 14:53:28,374 | INFO | [AGENT-DA-01] Behavior NORMAL — ML: Normal | Risk: 0.1
+2026-05-17 14:53:33,375 | INFO | Sentinel analyzing: [AGENT-ROGUE-01] → [fetch_data]
+2026-05-17 14:53:33,375 | INFO | [AGENT-ST-01] Authentication successful
+2026-05-17 14:53:33,376 | ERROR | ❌ ERROR | ML error: X has 7 features, but StandardScaler is expecting 5 features as input. — using rules
+2026-05-17 14:53:33,377 | INFO | ML Detection: [AGENT-ROGUE-01] → Normal | Risk: 0.1 | Method: RULE
+2026-05-17 14:53:33,377 | INFO | [AGENT-ST-01] Calling LLM: openrouter/free
+2026-05-17 14:53:34,781 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 14:53:38,544 | WARNING | 🚨 THREAT | [AGENT-ROGUE-01] Level: HIGH | Flags: ['HIGH_REQUEST_COUNT', 'REPEATED_ACTION', 'LARGE_DATA_EXPORT'] | ML: Normal
+2026-05-17 14:53:45,906 | WARNING | 🚨 THREAT | AGENT-ROGUE-01 blocked by Arbiter on Sentinel request
+2026-05-17 14:53:45,907 | INFO | Starting Adversary Agent Tests
+2026-05-17 14:53:48,982 | INFO | [AGENT-AD-01] Backend JWT token received
+2026-05-17 14:53:48,983 | INFO | Agent [AGENT-AD-01] initialized | Role: Adversary
+2026-05-17 14:53:51,984 | INFO | [AGENT-AD-01] Calling LLM: openrouter/free
+2026-05-17 14:53:52,996 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 14:53:58,335 | INFO | [AGENT-AD-01] Calling LLM: openrouter/free
+2026-05-17 14:54:01,787 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 14:54:18,972 | INFO | All tests completed successfully
+2026-05-17 16:36:12,158 | INFO | ============================================================
+2026-05-17 16:36:12,159 | INFO |    NFTCIPHER — FULL AGENT TEST SUITE STARTED
+2026-05-17 16:36:12,169 | INFO | ============================================================
+2026-05-17 16:36:12,171 | INFO | Starting Data-Access Agent Tests
+2026-05-17 16:36:15,408 | INFO | [AGENT-DA-01] Backend JWT token received
+2026-05-17 16:36:15,409 | INFO | Agent [AGENT-DA-01] initialized | Role: Data Access
+2026-05-17 16:36:15,409 | INFO | [AGENT-DA-01] Authentication successful
+2026-05-17 16:36:15,410 | INFO | [AGENT-DA-01] Calling LLM: openrouter/free
+2026-05-17 16:36:18,015 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 16:36:27,390 | INFO | [AGENT-DA-01] Authentication successful
+2026-05-17 16:36:27,390 | INFO | [AGENT-DA-01] Calling LLM: openrouter/free
+2026-05-17 16:36:31,375 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 17:10:25,359 | INFO | ============================================================
+2026-05-17 17:10:25,360 | INFO |    NFTCIPHER — FULL AGENT TEST SUITE STARTED
+2026-05-17 17:10:25,360 | INFO | ============================================================
+2026-05-17 17:10:25,361 | INFO | Starting Data-Access Agent Tests
+2026-05-17 17:10:28,288 | INFO | [AGENT-DA-01] Backend JWT token received
+2026-05-17 17:10:28,289 | INFO | Agent [AGENT-DA-01] initialized | Role: Data Access
+2026-05-17 17:10:28,289 | INFO | [AGENT-DA-01] Authentication successful
+2026-05-17 17:10:28,290 | INFO | [AGENT-DA-01] Calling LLM: :free
+2026-05-17 17:10:30,480 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 404 Not Found"
+2026-05-17 17:10:30,482 | ERROR | ❌ ERROR | [AGENT-DA-01] LLM error: Error code: 404 - {'error': {'message': 'No endpoints found for :free.', 'code': 404}, 'user_id': 'user_3Cvk7t38MrgtTqmK9cyEUNyH2LF'}
+2026-05-17 17:10:30,483 | ERROR | ❌ ERROR | [AGENT-DA-01] LLM unavailable — safe default
+2026-05-17 17:10:34,800 | INFO | [AGENT-DA-01] Authentication successful
+2026-05-17 17:10:34,800 | INFO | [AGENT-DA-01] Calling LLM: :free
+2026-05-17 17:10:34,913 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 404 Not Found"
+2026-05-17 17:10:34,914 | ERROR | ❌ ERROR | [AGENT-DA-01] LLM error: Error code: 404 - {'error': {'message': 'No endpoints found for :free.', 'code': 404}, 'user_id': 'user_3Cvk7t38MrgtTqmK9cyEUNyH2LF'}
+2026-05-17 17:10:34,915 | ERROR | ❌ ERROR | [AGENT-DA-01] LLM unavailable — safe default
+2026-05-17 17:10:38,988 | INFO | Starting Cloud-API Agent Tests
+2026-05-17 17:10:41,867 | INFO | [AGENT-CA-01] Backend JWT token received
+2026-05-17 17:10:41,867 | INFO | Agent [AGENT-CA-01] initialized | Role: Cloud API
+2026-05-17 17:10:41,868 | INFO | [AGENT-CA-01] Authentication successful
+2026-05-17 17:10:41,868 | INFO | [AGENT-CA-01] Calling LLM: :free
+2026-05-17 17:10:42,241 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 404 Not Found"
+2026-05-17 17:10:42,242 | ERROR | ❌ ERROR | [AGENT-CA-01] LLM error: Error code: 404 - {'error': {'message': 'No endpoints found for :free.', 'code': 404}, 'user_id': 'user_3Cvk7t38MrgtTqmK9cyEUNyH2LF'}
+2026-05-17 17:10:42,243 | ERROR | ❌ ERROR | [AGENT-CA-01] LLM unavailable — safe default
+2026-05-17 17:10:46,286 | INFO | ✅ ALLOWED | [AGENT-CA-01] cloud_aws_s3_list_buckets
+2026-05-17 17:10:46,287 | INFO | [AGENT-CA-01] Authentication successful
+2026-05-17 17:10:46,287 | WARNING | ❌ DENIED | [AGENT-CA-01] blocked_service_unknown_service
+2026-05-17 17:10:46,288 | INFO | Starting Arbiter Agent Tests
+2026-05-17 17:10:49,019 | INFO | [AGENT-AR-01] Backend JWT token received
+2026-05-17 17:10:49,020 | INFO | Agent [AGENT-AR-01] initialized | Role: Arbiter
+2026-05-17 17:10:52,021 | INFO | [AGENT-AR-01] Authentication successful
+2026-05-17 17:10:56,299 | INFO | [AGENT-AR-01] Calling LLM: :free
+2026-05-17 17:10:56,671 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 404 Not Found"
+2026-05-17 17:10:56,672 | ERROR | ❌ ERROR | [AGENT-AR-01] LLM error: Error code: 404 - {'error': {'message': 'No endpoints found for :free.', 'code': 404}, 'user_id': 'user_3Cvk7t38MrgtTqmK9cyEUNyH2LF'}
+2026-05-17 17:10:56,673 | ERROR | ❌ ERROR | [AGENT-AR-01] LLM unavailable — safe default
+2026-05-17 17:10:56,673 | INFO | ✅ ALLOWED | [AGENT-AR-01] ALLOWED_AGENT-DA-01_read_database
+2026-05-17 17:11:01,674 | INFO | [AGENT-AR-01] Authentication successful
+2026-05-17 17:11:04,096 | WARNING | ❌ DENIED | [AGENT-AR-01] NO_PERMISSION_AGENT-DA-01
+2026-05-17 17:11:14,097 | INFO | [AGENT-AR-01] Authentication successful
+2026-05-17 17:11:16,161 | WARNING | ❌ DENIED | [AGENT-AR-01] NO_PERMISSION_AGENT-DA-01
+2026-05-17 17:11:21,162 | INFO | Starting Sentinel Agent Tests
+2026-05-17 17:11:24,101 | INFO | [AGENT-ST-01] Backend JWT token received
+2026-05-17 17:11:24,102 | INFO | Agent [AGENT-ST-01] initialized | Role: Sentinel
+2026-05-17 17:15:49,954 | INFO | ============================================================
+2026-05-17 17:15:49,955 | INFO |    NFTCIPHER — FULL AGENT TEST SUITE STARTED
+2026-05-17 17:15:49,955 | INFO | ============================================================
+2026-05-17 17:15:49,956 | INFO | Starting Data-Access Agent Tests
+2026-05-17 17:15:52,885 | INFO | [AGENT-DA-01] Backend JWT token received
+2026-05-17 17:15:52,886 | INFO | Agent [AGENT-DA-01] initialized | Role: Data Access
+2026-05-17 17:15:52,886 | INFO | [AGENT-DA-01] Authentication successful
+2026-05-17 17:15:52,887 | INFO | [AGENT-DA-01] Calling LLM: deepseek/deepseek-v4-flash:free
+2026-05-17 17:15:55,821 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 17:16:28,861 | ERROR | ❌ ERROR | [AGENT-DA-01] LLM unavailable — safe default
+2026-05-17 17:16:33,214 | INFO | [AGENT-DA-01] Authentication successful
+2026-05-17 17:16:33,215 | INFO | [AGENT-DA-01] Calling LLM: deepseek/deepseek-v4-flash:free
+2026-05-17 17:16:33,972 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 17:16:34,001 | ERROR | ❌ ERROR | [AGENT-DA-01] LLM unavailable — safe default
+2026-05-17 17:17:59,018 | INFO | ============================================================
+2026-05-17 17:17:59,019 | INFO |    NFTCIPHER — FULL AGENT TEST SUITE STARTED
+2026-05-17 17:17:59,019 | INFO | ============================================================
+2026-05-17 17:17:59,020 | INFO | Starting Data-Access Agent Tests
+2026-05-17 17:18:01,835 | INFO | [AGENT-DA-01] Backend JWT token received
+2026-05-17 17:18:01,836 | INFO | Agent [AGENT-DA-01] initialized | Role: Data Access
+2026-05-17 17:18:01,836 | INFO | [AGENT-DA-01] Authentication successful
+2026-05-17 17:18:01,836 | INFO | [AGENT-DA-01] Calling LLM: openrouter/free
+2026-05-17 17:18:14,297 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 17:18:35,710 | INFO | [AGENT-DA-01] Authentication successful
+2026-05-17 17:18:35,710 | INFO | [AGENT-DA-01] Calling LLM: openrouter/free
+2026-05-17 17:18:36,328 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 17:18:37,622 | WARNING | ❌ DENIED | [AGENT-DA-01] fetch_users_DENIED
+2026-05-17 17:18:37,622 | INFO | Starting Cloud-API Agent Tests
+2026-05-17 17:18:40,607 | INFO | [AGENT-CA-01] Backend JWT token received
+2026-05-17 17:18:40,608 | INFO | Agent [AGENT-CA-01] initialized | Role: Cloud API
+2026-05-17 17:18:40,609 | INFO | [AGENT-CA-01] Authentication successful
+2026-05-17 17:18:40,609 | INFO | [AGENT-CA-01] Calling LLM: openrouter/free
+2026-05-17 17:18:42,064 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 17:26:56,803 | INFO | ============================================================
+2026-05-17 17:26:56,803 | INFO |    NFTCIPHER — FULL AGENT TEST SUITE STARTED
+2026-05-17 17:26:56,804 | INFO | ============================================================
+2026-05-17 17:26:56,805 | INFO | Starting Data-Access Agent Tests
+2026-05-17 17:26:59,866 | INFO | [AGENT-DA-01] Backend JWT token received
+2026-05-17 17:26:59,867 | INFO | Agent [AGENT-DA-01] initialized | Role: Data Access
+2026-05-17 17:26:59,867 | INFO | [AGENT-DA-01] Authentication successful
+2026-05-17 17:26:59,868 | INFO | [AGENT-DA-01] Calling LLM: openrouter/free
+2026-05-17 17:27:03,285 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 17:27:08,736 | INFO | [AGENT-DA-01] Authentication successful
+2026-05-17 17:27:08,736 | INFO | [AGENT-DA-01] Calling LLM: openrouter/free
+2026-05-17 17:27:12,072 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 17:27:52,213 | WARNING | ❌ DENIED | [AGENT-DA-01] fetch_users_DENIED
+2026-05-17 17:27:52,214 | INFO | Starting Cloud-API Agent Tests
+2026-05-17 17:27:55,061 | INFO | [AGENT-CA-01] Backend JWT token received
+2026-05-17 17:27:55,061 | INFO | Agent [AGENT-CA-01] initialized | Role: Cloud API
+2026-05-17 17:27:55,062 | INFO | [AGENT-CA-01] Authentication successful
+2026-05-17 17:27:55,062 | INFO | [AGENT-CA-01] Calling LLM: openrouter/free
+2026-05-17 17:27:58,784 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 17:28:08,268 | INFO | ✅ ALLOWED | [AGENT-CA-01] cloud_aws_s3_list_buckets
+2026-05-17 17:28:08,269 | INFO | [AGENT-CA-01] Authentication successful
+2026-05-17 17:28:08,269 | WARNING | ❌ DENIED | [AGENT-CA-01] blocked_service_unknown_service
+2026-05-17 17:28:08,270 | INFO | Starting Arbiter Agent Tests
+2026-05-17 17:28:11,379 | INFO | [AGENT-AR-01] Backend JWT token received
+2026-05-17 17:28:11,380 | INFO | Agent [AGENT-AR-01] initialized | Role: Arbiter
+2026-05-17 17:28:14,381 | INFO | [AGENT-AR-01] Authentication successful
+2026-05-17 17:28:18,813 | INFO | [AGENT-AR-01] Calling LLM: openrouter/free
+2026-05-17 17:28:23,977 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 17:28:24,014 | INFO | ✅ ALLOWED | [AGENT-AR-01] ALLOWED_AGENT-DA-01_read_database
+2026-05-17 17:28:29,015 | INFO | [AGENT-AR-01] Authentication successful
+2026-05-17 17:28:31,060 | WARNING | ❌ DENIED | [AGENT-AR-01] NO_PERMISSION_AGENT-DA-01
+2026-05-17 17:34:34,408 | INFO | ============================================================
+2026-05-17 17:34:34,409 | INFO |    NFTCIPHER — FULL AGENT TEST SUITE STARTED
+2026-05-17 17:34:34,409 | INFO | ============================================================
+2026-05-17 17:34:34,410 | INFO | Starting Data-Access Agent Tests
+2026-05-17 17:34:37,368 | INFO | [AGENT-DA-01] Backend JWT token received
+2026-05-17 17:34:37,368 | INFO | Agent [AGENT-DA-01] initialized | Role: Data Access
+2026-05-17 17:34:37,369 | INFO | [AGENT-DA-01] Authentication successful
+2026-05-17 17:34:37,369 | INFO | [AGENT-DA-01] Calling LLM: meta-llama/llama-3.1-8b-instruct:free
+2026-05-17 17:34:39,578 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 404 Not Found"
+2026-05-17 17:34:39,580 | ERROR | ❌ ERROR | [AGENT-DA-01] Model meta-llama/llama-3.1-8b-instruct:free not available: Error code: 404 - {'error': {'message': 'No endpoints found for meta-llama/llama-3.1-8b-instruct:free.', 'code': 404}, 'user_id': 'user_3Cvk7t38MrgtTqmK9cyEUNyH2LF'}
+2026-05-17 17:34:39,580 | INFO | [AGENT-DA-01] Calling LLM: google/gemma-3-4b-it:free
+2026-05-17 17:34:40,535 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 404 Not Found"
+2026-05-17 17:34:40,537 | ERROR | ❌ ERROR | [AGENT-DA-01] Model google/gemma-3-4b-it:free not available: Error code: 404 - {'error': {'message': 'No endpoints found for google/gemma-3-4b-it:free.', 'code': 404}, 'user_id': 'user_3Cvk7t38MrgtTqmK9cyEUNyH2LF'}
+2026-05-17 17:34:40,537 | INFO | [AGENT-DA-01] Calling LLM: mistralai/mistral-7b-instruct:free
+2026-05-17 17:34:40,724 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 404 Not Found"
+2026-05-17 17:34:40,726 | ERROR | ❌ ERROR | [AGENT-DA-01] Model mistralai/mistral-7b-instruct:free not available: Error code: 404 - {'error': {'message': 'No endpoints found for mistralai/mistral-7b-instruct:free.', 'code': 404}, 'user_id': 'user_3Cvk7t38MrgtTqmK9cyEUNyH2LF'}
+2026-05-17 17:34:40,726 | ERROR | ❌ ERROR | [AGENT-DA-01] All LLM models failed — using safe default
+2026-05-17 17:34:40,726 | ERROR | ❌ ERROR | [AGENT-DA-01] LLM unavailable — safe default
+2026-05-17 17:34:44,915 | INFO | ✅ ALLOWED | [AGENT-DA-01] fetch_users
+2026-05-17 17:34:44,916 | INFO | [AGENT-DA-01] Authentication successful
+2026-05-17 17:34:44,916 | INFO | [AGENT-DA-01] Calling LLM: meta-llama/llama-3.1-8b-instruct:free
+2026-05-17 17:34:45,316 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 404 Not Found"
+2026-05-17 17:34:45,318 | ERROR | ❌ ERROR | [AGENT-DA-01] Model meta-llama/llama-3.1-8b-instruct:free not available: Error code: 404 - {'error': {'message': 'No endpoints found for meta-llama/llama-3.1-8b-instruct:free.', 'code': 404}, 'user_id': 'user_3Cvk7t38MrgtTqmK9cyEUNyH2LF'}
+2026-05-17 17:34:45,318 | INFO | [AGENT-DA-01] Calling LLM: google/gemma-3-4b-it:free
+2026-05-17 17:34:45,454 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 404 Not Found"
+2026-05-17 17:34:45,455 | ERROR | ❌ ERROR | [AGENT-DA-01] Model google/gemma-3-4b-it:free not available: Error code: 404 - {'error': {'message': 'No endpoints found for google/gemma-3-4b-it:free.', 'code': 404}, 'user_id': 'user_3Cvk7t38MrgtTqmK9cyEUNyH2LF'}
+2026-05-17 17:34:45,456 | INFO | [AGENT-DA-01] Calling LLM: mistralai/mistral-7b-instruct:free
+2026-05-17 17:34:45,625 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 404 Not Found"
+2026-05-17 17:34:45,627 | ERROR | ❌ ERROR | [AGENT-DA-01] Model mistralai/mistral-7b-instruct:free not available: Error code: 404 - {'error': {'message': 'No endpoints found for mistralai/mistral-7b-instruct:free.', 'code': 404}, 'user_id': 'user_3Cvk7t38MrgtTqmK9cyEUNyH2LF'}
+2026-05-17 17:34:45,627 | ERROR | ❌ ERROR | [AGENT-DA-01] All LLM models failed — using safe default
+2026-05-17 17:34:45,628 | ERROR | ❌ ERROR | [AGENT-DA-01] LLM unavailable — safe default
+2026-05-17 17:34:50,092 | INFO | ✅ ALLOWED | [AGENT-DA-01] fetch_users
+2026-05-17 17:34:50,094 | INFO | Starting Cloud-API Agent Tests
+2026-05-17 17:34:52,939 | INFO | [AGENT-CA-01] Backend JWT token received
+2026-05-17 17:34:52,940 | INFO | Agent [AGENT-CA-01] initialized | Role: Cloud API
+2026-05-17 17:34:52,940 | INFO | [AGENT-CA-01] Authentication successful
+2026-05-17 17:34:52,941 | INFO | [AGENT-CA-01] Calling LLM: meta-llama/llama-3.1-8b-instruct:free
+2026-05-17 17:34:53,287 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 404 Not Found"
+2026-05-17 17:34:53,289 | ERROR | ❌ ERROR | [AGENT-CA-01] Model meta-llama/llama-3.1-8b-instruct:free not available: Error code: 404 - {'error': {'message': 'No endpoints found for meta-llama/llama-3.1-8b-instruct:free.', 'code': 404}, 'user_id': 'user_3Cvk7t38MrgtTqmK9cyEUNyH2LF'}
+2026-05-17 17:34:53,290 | INFO | [AGENT-CA-01] Calling LLM: google/gemma-3-4b-it:free
+2026-05-17 17:34:53,405 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 404 Not Found"
+2026-05-17 17:34:53,406 | ERROR | ❌ ERROR | [AGENT-CA-01] Model google/gemma-3-4b-it:free not available: Error code: 404 - {'error': {'message': 'No endpoints found for google/gemma-3-4b-it:free.', 'code': 404}, 'user_id': 'user_3Cvk7t38MrgtTqmK9cyEUNyH2LF'}
+2026-05-17 17:34:53,407 | INFO | [AGENT-CA-01] Calling LLM: mistralai/mistral-7b-instruct:free
+2026-05-17 17:34:53,522 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 404 Not Found"
+2026-05-17 17:34:53,523 | ERROR | ❌ ERROR | [AGENT-CA-01] Model mistralai/mistral-7b-instruct:free not available: Error code: 404 - {'error': {'message': 'No endpoints found for mistralai/mistral-7b-instruct:free.', 'code': 404}, 'user_id': 'user_3Cvk7t38MrgtTqmK9cyEUNyH2LF'}
+2026-05-17 17:34:53,523 | ERROR | ❌ ERROR | [AGENT-CA-01] All LLM models failed — using safe default
+2026-05-17 17:34:53,524 | ERROR | ❌ ERROR | [AGENT-CA-01] LLM unavailable — safe default
+2026-05-17 17:34:57,680 | INFO | ✅ ALLOWED | [AGENT-CA-01] cloud_aws_s3_list_buckets
+2026-05-17 17:34:57,681 | INFO | [AGENT-CA-01] Authentication successful
+2026-05-17 17:34:57,681 | WARNING | ❌ DENIED | [AGENT-CA-01] blocked_service_unknown_service
+2026-05-17 17:34:57,682 | INFO | Starting Arbiter Agent Tests
+2026-05-17 17:35:00,778 | INFO | [AGENT-AR-01] Backend JWT token received
+2026-05-17 17:35:00,778 | INFO | Agent [AGENT-AR-01] initialized | Role: Arbiter
+2026-05-17 17:35:03,779 | INFO | [AGENT-AR-01] Authentication successful
+2026-05-17 17:35:07,876 | INFO | [AGENT-AR-01] Calling LLM: meta-llama/llama-3.1-8b-instruct:free
+2026-05-17 17:35:08,248 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 404 Not Found"
+2026-05-17 17:35:08,249 | ERROR | ❌ ERROR | [AGENT-AR-01] Model meta-llama/llama-3.1-8b-instruct:free not available: Error code: 404 - {'error': {'message': 'No endpoints found for meta-llama/llama-3.1-8b-instruct:free.', 'code': 404}, 'user_id': 'user_3Cvk7t38MrgtTqmK9cyEUNyH2LF'}
+2026-05-17 17:35:08,250 | INFO | [AGENT-AR-01] Calling LLM: google/gemma-3-4b-it:free
+2026-05-17 17:35:08,372 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 404 Not Found"
+2026-05-17 17:35:08,374 | ERROR | ❌ ERROR | [AGENT-AR-01] Model google/gemma-3-4b-it:free not available: Error code: 404 - {'error': {'message': 'No endpoints found for google/gemma-3-4b-it:free.', 'code': 404}, 'user_id': 'user_3Cvk7t38MrgtTqmK9cyEUNyH2LF'}
+2026-05-17 17:35:08,375 | INFO | [AGENT-AR-01] Calling LLM: mistralai/mistral-7b-instruct:free
+2026-05-17 17:35:08,497 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 404 Not Found"
+2026-05-17 17:35:08,498 | ERROR | ❌ ERROR | [AGENT-AR-01] Model mistralai/mistral-7b-instruct:free not available: Error code: 404 - {'error': {'message': 'No endpoints found for mistralai/mistral-7b-instruct:free.', 'code': 404}, 'user_id': 'user_3Cvk7t38MrgtTqmK9cyEUNyH2LF'}
+2026-05-17 17:35:08,499 | ERROR | ❌ ERROR | [AGENT-AR-01] All LLM models failed — using safe default
+2026-05-17 17:35:08,499 | ERROR | ❌ ERROR | [AGENT-AR-01] LLM unavailable — safe default
+2026-05-17 17:35:08,499 | INFO | ✅ ALLOWED | [AGENT-AR-01] ALLOWED_AGENT-DA-01_read_database
+2026-05-17 17:35:13,500 | INFO | [AGENT-AR-01] Authentication successful
+2026-05-17 17:35:17,803 | INFO | [AGENT-AR-01] Calling LLM: meta-llama/llama-3.1-8b-instruct:free
+2026-05-17 17:35:18,330 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 404 Not Found"
+2026-05-17 17:35:18,331 | ERROR | ❌ ERROR | [AGENT-AR-01] Model meta-llama/llama-3.1-8b-instruct:free not available: Error code: 404 - {'error': {'message': 'No endpoints found for meta-llama/llama-3.1-8b-instruct:free.', 'code': 404}, 'user_id': 'user_3Cvk7t38MrgtTqmK9cyEUNyH2LF'}
+2026-05-17 17:35:18,332 | INFO | [AGENT-AR-01] Calling LLM: google/gemma-3-4b-it:free
+2026-05-17 17:35:18,446 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 404 Not Found"
+2026-05-17 17:35:18,447 | ERROR | ❌ ERROR | [AGENT-AR-01] Model google/gemma-3-4b-it:free not available: Error code: 404 - {'error': {'message': 'No endpoints found for google/gemma-3-4b-it:free.', 'code': 404}, 'user_id': 'user_3Cvk7t38MrgtTqmK9cyEUNyH2LF'}
+2026-05-17 17:35:18,447 | INFO | [AGENT-AR-01] Calling LLM: mistralai/mistral-7b-instruct:free
+2026-05-17 17:35:18,562 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 404 Not Found"
+2026-05-17 17:35:18,567 | ERROR | ❌ ERROR | [AGENT-AR-01] Model mistralai/mistral-7b-instruct:free not available: Error code: 404 - {'error': {'message': 'No endpoints found for mistralai/mistral-7b-instruct:free.', 'code': 404}, 'user_id': 'user_3Cvk7t38MrgtTqmK9cyEUNyH2LF'}
+2026-05-17 17:35:18,567 | ERROR | ❌ ERROR | [AGENT-AR-01] All LLM models failed — using safe default
+2026-05-17 17:35:18,567 | ERROR | ❌ ERROR | [AGENT-AR-01] LLM unavailable — safe default
+2026-05-17 17:35:18,568 | INFO | ✅ ALLOWED | [AGENT-AR-01] ALLOWED_AGENT-DA-01_call_cloud
+2026-05-17 17:35:28,570 | INFO | [AGENT-AR-01] Authentication successful
+2026-05-17 17:35:32,746 | INFO | [AGENT-AR-01] Calling LLM: meta-llama/llama-3.1-8b-instruct:free
+2026-05-17 17:35:33,251 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 404 Not Found"
+2026-05-17 17:35:33,253 | ERROR | ❌ ERROR | [AGENT-AR-01] Model meta-llama/llama-3.1-8b-instruct:free not available: Error code: 404 - {'error': {'message': 'No endpoints found for meta-llama/llama-3.1-8b-instruct:free.', 'code': 404}, 'user_id': 'user_3Cvk7t38MrgtTqmK9cyEUNyH2LF'}
+2026-05-17 17:35:33,253 | INFO | [AGENT-AR-01] Calling LLM: google/gemma-3-4b-it:free
+2026-05-17 17:35:33,669 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 404 Not Found"
+2026-05-17 17:35:33,671 | ERROR | ❌ ERROR | [AGENT-AR-01] Model google/gemma-3-4b-it:free not available: Error code: 404 - {'error': {'message': 'No endpoints found for google/gemma-3-4b-it:free.', 'code': 404}, 'user_id': 'user_3Cvk7t38MrgtTqmK9cyEUNyH2LF'}
+2026-05-17 17:35:33,671 | INFO | [AGENT-AR-01] Calling LLM: mistralai/mistral-7b-instruct:free
+2026-05-17 17:35:34,276 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 404 Not Found"
+2026-05-17 17:35:34,278 | ERROR | ❌ ERROR | [AGENT-AR-01] Model mistralai/mistral-7b-instruct:free not available: Error code: 404 - {'error': {'message': 'No endpoints found for mistralai/mistral-7b-instruct:free.', 'code': 404}, 'user_id': 'user_3Cvk7t38MrgtTqmK9cyEUNyH2LF'}
+2026-05-17 17:35:34,278 | ERROR | ❌ ERROR | [AGENT-AR-01] All LLM models failed — using safe default
+2026-05-17 17:35:34,279 | ERROR | ❌ ERROR | [AGENT-AR-01] LLM unavailable — safe default
+2026-05-17 17:35:34,279 | INFO | ✅ ALLOWED | [AGENT-AR-01] ALLOWED_AGENT-DA-01_delete all database records
+2026-05-17 17:35:39,280 | INFO | Starting Sentinel Agent Tests
+2026-05-17 17:35:42,178 | INFO | [AGENT-ST-01] Backend JWT token received
+2026-05-17 17:35:42,179 | INFO | Agent [AGENT-ST-01] initialized | Role: Sentinel
+2026-05-17 17:35:45,425 | INFO | NumExpr defaulting to 8 threads.
+2026-05-17 17:35:46,828 | INFO | Anomaly Detection model loaded successfully
+2026-05-17 17:35:49,829 | INFO | Sentinel analyzing: [AGENT-DA-01] → [fetch_users]
+2026-05-17 17:35:49,829 | INFO | [AGENT-ST-01] Authentication successful
+2026-05-17 17:35:49,830 | ERROR | ❌ ERROR | ML error: X has 7 features, but StandardScaler is expecting 5 features as input. — using rules
+2026-05-17 17:35:49,831 | INFO | ML Detection: [AGENT-DA-01] → Normal | Risk: 0.1 | Method: RULE
+2026-05-17 17:35:49,831 | INFO | [AGENT-DA-01] Behavior NORMAL — ML: Normal | Risk: 0.1
+2026-05-17 17:35:54,832 | INFO | Sentinel analyzing: [AGENT-ROGUE-01] → [fetch_data]
+2026-05-17 17:35:54,833 | INFO | [AGENT-ST-01] Authentication successful
+2026-05-17 17:35:54,833 | ERROR | ❌ ERROR | ML error: X has 7 features, but StandardScaler is expecting 5 features as input. — using rules
+2026-05-17 17:35:54,834 | INFO | ML Detection: [AGENT-ROGUE-01] → Normal | Risk: 0.1 | Method: RULE
+2026-05-17 17:35:54,834 | INFO | [AGENT-ST-01] Calling LLM: meta-llama/llama-3.1-8b-instruct:free
+2026-05-17 17:35:55,225 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 404 Not Found"
+2026-05-17 17:35:55,227 | ERROR | ❌ ERROR | [AGENT-ST-01] Model meta-llama/llama-3.1-8b-instruct:free not available: Error code: 404 - {'error': {'message': 'No endpoints found for meta-llama/llama-3.1-8b-instruct:free.', 'code': 404}, 'user_id': 'user_3Cvk7t38MrgtTqmK9cyEUNyH2LF'}
+2026-05-17 17:35:55,228 | INFO | [AGENT-ST-01] Calling LLM: google/gemma-3-4b-it:free
+2026-05-17 17:35:55,355 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 404 Not Found"
+2026-05-17 17:35:55,356 | ERROR | ❌ ERROR | [AGENT-ST-01] Model google/gemma-3-4b-it:free not available: Error code: 404 - {'error': {'message': 'No endpoints found for google/gemma-3-4b-it:free.', 'code': 404}, 'user_id': 'user_3Cvk7t38MrgtTqmK9cyEUNyH2LF'}
+2026-05-17 17:35:55,357 | INFO | [AGENT-ST-01] Calling LLM: mistralai/mistral-7b-instruct:free
+2026-05-17 17:35:55,484 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 404 Not Found"
+2026-05-17 17:35:55,486 | ERROR | ❌ ERROR | [AGENT-ST-01] Model mistralai/mistral-7b-instruct:free not available: Error code: 404 - {'error': {'message': 'No endpoints found for mistralai/mistral-7b-instruct:free.', 'code': 404}, 'user_id': 'user_3Cvk7t38MrgtTqmK9cyEUNyH2LF'}
+2026-05-17 17:35:55,486 | ERROR | ❌ ERROR | [AGENT-ST-01] All LLM models failed — using safe default
+2026-05-17 17:35:55,486 | ERROR | ❌ ERROR | [AGENT-ST-01] LLM unavailable — safe default
+2026-05-17 17:35:55,487 | INFO | [AGENT-ROGUE-01] Behavior NORMAL — ML: Normal | Risk: 0.1
+2026-05-17 17:40:39,724 | INFO | ============================================================
+2026-05-17 17:40:39,725 | INFO |    NFTCIPHER — FULL AGENT TEST SUITE STARTED
+2026-05-17 17:40:39,725 | INFO | ============================================================
+2026-05-17 17:40:39,726 | INFO | Starting Data-Access Agent Tests
+2026-05-17 17:40:42,592 | INFO | [AGENT-DA-01] Backend JWT token received
+2026-05-17 17:40:42,593 | INFO | Agent [AGENT-DA-01] initialized | Role: Data Access
+2026-05-17 17:40:42,594 | INFO | [AGENT-DA-01] Authentication successful
+2026-05-17 17:40:42,594 | INFO | [AGENT-DA-01] Calling LLM: openrouter/free
+2026-05-17 17:40:45,197 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 17:40:50,752 | INFO | ✅ ALLOWED | [AGENT-DA-01] fetch_users
+2026-05-17 17:40:50,753 | INFO | [AGENT-DA-01] Authentication successful
+2026-05-17 17:40:50,754 | INFO | [AGENT-DA-01] Calling LLM: openrouter/free
+2026-05-17 17:40:51,642 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 17:40:58,242 | WARNING | ❌ DENIED | [AGENT-DA-01] fetch_users_DENIED
+2026-05-17 17:40:58,242 | INFO | Starting Cloud-API Agent Tests
+2026-05-17 17:41:01,247 | INFO | [AGENT-CA-01] Backend JWT token received
+2026-05-17 17:41:01,248 | INFO | Agent [AGENT-CA-01] initialized | Role: Cloud API
+2026-05-17 17:41:01,249 | INFO | [AGENT-CA-01] Authentication successful
+2026-05-17 17:41:01,249 | INFO | [AGENT-CA-01] Calling LLM: openrouter/free
+2026-05-17 17:41:02,994 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 17:42:04,573 | ERROR | ❌ ERROR | [AGENT-ST-01] Backend login error: HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=5)
+2026-05-17 17:42:04,575 | INFO | Agent [AGENT-ST-01] initialized | Role: Sentinel
+2026-05-17 17:42:04,592 | INFO | Anomaly Detection model loaded successfully
+2026-05-17 17:42:12,416 | ERROR | ❌ ERROR | [AGENT-AR-01] Backend login error: HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=5)
+2026-05-17 17:42:12,416 | INFO | Agent [AGENT-AR-01] initialized | Role: Arbiter
+2026-05-17 17:42:20,248 | ERROR | ❌ ERROR | [AGENT-DA-01] Backend login error: HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=5)
+2026-05-17 17:42:20,249 | INFO | Agent [AGENT-DA-01] initialized | Role: Data Access
+2026-05-17 17:42:28,299 | ERROR | ❌ ERROR | [AGENT-CA-01] Backend login error: HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=5)
+2026-05-17 17:42:28,300 | INFO | Agent [AGENT-CA-01] initialized | Role: Cloud API
+2026-05-17 17:42:36,370 | ERROR | ❌ ERROR | [AGENT-AD-01] Backend login error: HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=5)
+2026-05-17 17:42:36,370 | INFO | Agent [AGENT-AD-01] initialized | Role: Adversary
+2026-05-17 17:47:49,865 | ERROR | ❌ ERROR | [AGENT-ST-01] Backend login error: HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=5)
+2026-05-17 17:47:49,866 | INFO | Agent [AGENT-ST-01] initialized | Role: Sentinel
+2026-05-17 17:47:49,880 | INFO | Anomaly Detection model loaded successfully
+2026-05-17 17:47:57,881 | ERROR | ❌ ERROR | [AGENT-AR-01] Backend login error: HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=5)
+2026-05-17 17:47:57,881 | INFO | Agent [AGENT-AR-01] initialized | Role: Arbiter
+2026-05-17 17:48:06,013 | ERROR | ❌ ERROR | [AGENT-DA-01] Backend login error: HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=5)
+2026-05-17 17:48:06,013 | INFO | Agent [AGENT-DA-01] initialized | Role: Data Access
+2026-05-17 17:48:14,376 | ERROR | ❌ ERROR | [AGENT-CA-01] Backend login error: HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=5)
+2026-05-17 17:48:14,376 | INFO | Agent [AGENT-CA-01] initialized | Role: Cloud API
+2026-05-17 17:48:22,328 | ERROR | ❌ ERROR | [AGENT-AD-01] Backend login error: HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=5)
+2026-05-17 17:48:22,328 | INFO | Agent [AGENT-AD-01] initialized | Role: Adversary
+2026-05-17 17:48:22,817 | INFO | Classical vs PQC comparison running
+2026-05-17 17:49:51,448 | INFO | Sentinel analyzing: [AGENT-AR-01] → [dashboard_check]
+2026-05-17 17:49:51,449 | INFO | [AGENT-ST-01] Authentication successful
+2026-05-17 17:49:51,451 | ERROR | ❌ ERROR | ML error: X has 7 features, but StandardScaler is expecting 5 features as input. — using rules
+2026-05-17 17:49:51,452 | INFO | ML Detection: [AGENT-AR-01] → Normal | Risk: 0.1 | Method: RULE
+2026-05-17 17:49:51,452 | INFO | [AGENT-AR-01] Behavior NORMAL — ML: Normal | Risk: 0.1
+2026-05-17 17:49:53,173 | INFO | Sentinel analyzing: [AGENT-ST-01] → [dashboard_check]
+2026-05-17 17:49:53,174 | INFO | [AGENT-ST-01] Authentication successful
+2026-05-17 17:49:53,174 | ERROR | ❌ ERROR | ML error: X has 7 features, but StandardScaler is expecting 5 features as input. — using rules
+2026-05-17 17:49:53,175 | INFO | ML Detection: [AGENT-ST-01] → Normal | Risk: 0.1 | Method: RULE
+2026-05-17 17:49:53,175 | INFO | [AGENT-ST-01] Behavior NORMAL — ML: Normal | Risk: 0.1
+2026-05-17 17:54:22,977 | ERROR | ❌ ERROR | [AGENT-ST-01] Backend login error: HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=5)
+2026-05-17 17:54:22,978 | INFO | Agent [AGENT-ST-01] initialized | Role: Sentinel
+2026-05-17 17:54:22,990 | INFO | Anomaly Detection model loaded successfully
+2026-05-17 17:54:30,846 | ERROR | ❌ ERROR | [AGENT-AR-01] Backend login error: HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=5)
+2026-05-17 17:54:30,847 | INFO | Agent [AGENT-AR-01] initialized | Role: Arbiter
+2026-05-17 17:54:38,601 | ERROR | ❌ ERROR | [AGENT-DA-01] Backend login error: HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=5)
+2026-05-17 17:54:38,601 | INFO | Agent [AGENT-DA-01] initialized | Role: Data Access
+2026-05-17 17:54:46,481 | ERROR | ❌ ERROR | [AGENT-CA-01] Backend login error: HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=5)
+2026-05-17 17:54:46,481 | INFO | Agent [AGENT-CA-01] initialized | Role: Cloud API
+2026-05-17 17:54:54,442 | ERROR | ❌ ERROR | [AGENT-AD-01] Backend login error: HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=5)
+2026-05-17 17:54:54,443 | INFO | Agent [AGENT-AD-01] initialized | Role: Adversary
+2026-05-17 18:01:43,168 | ERROR | ❌ ERROR | [AGENT-ST-01] Backend login error: HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=5)
+2026-05-17 18:01:43,169 | INFO | Agent [AGENT-ST-01] initialized | Role: Sentinel
+2026-05-17 18:01:43,182 | INFO | Anomaly Detection model loaded successfully
+2026-05-17 18:01:51,470 | ERROR | ❌ ERROR | [AGENT-AR-01] Backend login error: HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=5)
+2026-05-17 18:01:51,471 | INFO | Agent [AGENT-AR-01] initialized | Role: Arbiter
+2026-05-17 18:01:59,507 | ERROR | ❌ ERROR | [AGENT-DA-01] Backend login error: HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=5)
+2026-05-17 18:01:59,507 | INFO | Agent [AGENT-DA-01] initialized | Role: Data Access
+2026-05-17 18:02:07,531 | ERROR | ❌ ERROR | [AGENT-CA-01] Backend login error: HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=5)
+2026-05-17 18:02:07,532 | INFO | Agent [AGENT-CA-01] initialized | Role: Cloud API
+2026-05-17 18:02:15,548 | ERROR | ❌ ERROR | [AGENT-AD-01] Backend login error: HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=5)
+2026-05-17 18:02:15,548 | INFO | Agent [AGENT-AD-01] initialized | Role: Adversary
+2026-05-17 18:02:16,613 | INFO | Classical vs PQC comparison running
+2026-05-17 18:13:42,435 | ERROR | ❌ ERROR | [AGENT-ST-01] Backend login error: HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=90)
+2026-05-17 18:13:42,436 | INFO | Agent [AGENT-ST-01] initialized | Role: Sentinel
+2026-05-17 18:13:42,452 | INFO | Anomaly Detection model loaded successfully
+2026-05-17 18:15:15,777 | ERROR | ❌ ERROR | [AGENT-AR-01] Backend login error: HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=90)
+2026-05-17 18:15:15,778 | INFO | Agent [AGENT-AR-01] initialized | Role: Arbiter
+2026-05-17 18:16:48,856 | ERROR | ❌ ERROR | [AGENT-DA-01] Backend login error: HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=90)
+2026-05-17 18:16:48,856 | INFO | Agent [AGENT-DA-01] initialized | Role: Data Access
+2026-05-17 18:18:21,936 | ERROR | ❌ ERROR | [AGENT-CA-01] Backend login error: HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=90)
+2026-05-17 18:18:21,937 | INFO | Agent [AGENT-CA-01] initialized | Role: Cloud API
+2026-05-17 18:19:55,058 | ERROR | ❌ ERROR | [AGENT-AD-01] Backend login error: HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=90)
+2026-05-17 18:19:55,062 | INFO | Agent [AGENT-AD-01] initialized | Role: Adversary
+2026-05-17 18:31:33,827 | ERROR | ❌ ERROR | [AGENT-ST-01] Backend login error (attempt 1/3): HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=10)
+2026-05-17 18:31:47,908 | ERROR | ❌ ERROR | [AGENT-ST-01] Backend login error (attempt 2/3): HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=10)
+2026-05-17 18:32:01,953 | ERROR | ❌ ERROR | [AGENT-ST-01] Backend login error (attempt 3/3): HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=10)
+2026-05-17 18:32:01,954 | ERROR | ❌ ERROR | [AGENT-ST-01] All login attempts failed — agent will retry on next request
+2026-05-17 18:32:01,954 | INFO | Agent [AGENT-ST-01] initialized | Role: Sentinel
+2026-05-17 18:32:01,964 | INFO | Anomaly Detection model loaded successfully
+2026-05-17 18:32:14,718 | ERROR | ❌ ERROR | [AGENT-AR-01] Backend login error (attempt 1/3): HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=10)
+2026-05-17 18:32:29,112 | ERROR | ❌ ERROR | [AGENT-AR-01] Backend login error (attempt 2/3): HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=10)
+2026-05-17 18:32:43,170 | ERROR | ❌ ERROR | [AGENT-AR-01] Backend login error (attempt 3/3): HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=10)
+2026-05-17 18:32:43,171 | ERROR | ❌ ERROR | [AGENT-AR-01] All login attempts failed — agent will retry on next request
+2026-05-17 18:32:43,171 | INFO | Agent [AGENT-AR-01] initialized | Role: Arbiter
+2026-05-17 18:32:56,170 | ERROR | ❌ ERROR | [AGENT-DA-01] Backend login error (attempt 1/3): HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=10)
+2026-05-17 18:33:10,230 | ERROR | ❌ ERROR | [AGENT-DA-01] Backend login error (attempt 2/3): HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=10)
+2026-05-17 18:33:24,328 | ERROR | ❌ ERROR | [AGENT-DA-01] Backend login error (attempt 3/3): HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=10)
+2026-05-17 18:33:24,328 | ERROR | ❌ ERROR | [AGENT-DA-01] All login attempts failed — agent will retry on next request
+2026-05-17 18:33:24,329 | INFO | Agent [AGENT-DA-01] initialized | Role: Data Access
+2026-05-17 18:33:37,330 | ERROR | ❌ ERROR | [AGENT-CA-01] Backend login error (attempt 1/3): HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=10)
+2026-05-17 18:33:51,392 | ERROR | ❌ ERROR | [AGENT-CA-01] Backend login error (attempt 2/3): HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=10)
+2026-05-17 18:34:05,441 | ERROR | ❌ ERROR | [AGENT-CA-01] Backend login error (attempt 3/3): HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=10)
+2026-05-17 18:34:05,442 | ERROR | ❌ ERROR | [AGENT-CA-01] All login attempts failed — agent will retry on next request
+2026-05-17 18:34:05,442 | INFO | Agent [AGENT-CA-01] initialized | Role: Cloud API
+2026-05-17 18:34:18,477 | ERROR | ❌ ERROR | [AGENT-AD-01] Backend login error (attempt 1/3): HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=10)
+2026-05-17 18:34:32,820 | ERROR | ❌ ERROR | [AGENT-AD-01] Backend login error (attempt 2/3): HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=10)
+2026-05-17 18:34:46,882 | ERROR | ❌ ERROR | [AGENT-AD-01] Backend login error (attempt 3/3): HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=10)
+2026-05-17 18:34:46,882 | ERROR | ❌ ERROR | [AGENT-AD-01] All login attempts failed — agent will retry on next request
+2026-05-17 18:34:46,882 | INFO | Agent [AGENT-AD-01] initialized | Role: Adversary
+2026-05-17 18:34:58,916 | ERROR | ❌ ERROR | [AGENT-ST-01] Backend login error (attempt 1/3): HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=10)
+2026-05-17 18:35:12,964 | ERROR | ❌ ERROR | [AGENT-ST-01] Backend login error (attempt 2/3): HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=10)
+2026-05-17 18:35:27,173 | ERROR | ❌ ERROR | [AGENT-ST-01] Backend login error (attempt 3/3): HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=10)
+2026-05-17 18:35:27,174 | ERROR | ❌ ERROR | [AGENT-ST-01] All login attempts failed — agent will retry on next request
+2026-05-17 18:35:39,214 | ERROR | ❌ ERROR | [AGENT-AR-01] Backend login error (attempt 1/3): HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=10)
+2026-05-17 18:41:14,481 | INFO | [AGENT-ST-01] Token generated internally (direct)
+2026-05-17 18:41:14,482 | INFO | Agent [AGENT-ST-01] initialized | Role: Sentinel
+2026-05-17 18:41:14,499 | INFO | Anomaly Detection model loaded successfully
+2026-05-17 18:41:15,530 | INFO | [AGENT-AR-01] Token generated internally (direct)
+2026-05-17 18:41:15,531 | INFO | Agent [AGENT-AR-01] initialized | Role: Arbiter
+2026-05-17 18:41:16,571 | INFO | [AGENT-DA-01] Token generated internally (direct)
+2026-05-17 18:41:16,572 | INFO | Agent [AGENT-DA-01] initialized | Role: Data Access
+2026-05-17 18:41:17,573 | INFO | [AGENT-CA-01] Token generated internally (direct)
+2026-05-17 18:41:17,573 | INFO | Agent [AGENT-CA-01] initialized | Role: Cloud API
+2026-05-17 18:41:18,567 | INFO | [AGENT-AD-01] Token generated internally (direct)
+2026-05-17 18:41:18,567 | INFO | Agent [AGENT-AD-01] initialized | Role: Adversary
+2026-05-17 18:41:18,586 | INFO | Classical vs PQC comparison running
+2026-05-17 18:41:18,646 | INFO | Classical vs PQC comparison running
+2026-05-17 18:45:35,158 | INFO | [AGENT-AD-01] Calling LLM: openrouter/free
+2026-05-17 18:45:39,072 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 18:45:46,636 | INFO | [AGENT-AD-01] Calling LLM: openrouter/free
+2026-05-17 18:45:56,151 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 18:46:25,869 | INFO | Retrying request to /chat/completions in 0.482016 seconds
+2026-05-17 18:46:26,372 | INFO | Retrying request to /chat/completions in 0.975963 seconds
+2026-05-17 18:46:39,403 | ERROR | ❌ ERROR | [AGENT-AD-01] LLM error on openrouter/free: Connection error.
+2026-05-17 18:46:39,404 | INFO | [AGENT-AD-01] Calling LLM: deepseek/deepseek-r1:free
+2026-05-17 18:46:39,409 | INFO | Retrying request to /chat/completions in 0.449768 seconds
+2026-05-17 18:46:39,862 | INFO | Retrying request to /chat/completions in 0.787785 seconds
+2026-05-17 18:51:14,198 | INFO | Classical vs PQC comparison running
+2026-05-17 18:51:15,116 | INFO | [AGENT-ST-01] Token generated internally (direct)
+2026-05-17 18:51:15,116 | INFO | Agent [AGENT-ST-01] initialized | Role: Sentinel
+2026-05-17 18:51:15,129 | INFO | Anomaly Detection model loaded successfully
+2026-05-17 18:51:15,873 | INFO | [AGENT-AR-01] Token generated internally (direct)
+2026-05-17 18:51:15,874 | INFO | Agent [AGENT-AR-01] initialized | Role: Arbiter
+2026-05-17 18:51:16,590 | INFO | [AGENT-DA-01] Token generated internally (direct)
+2026-05-17 18:51:16,591 | INFO | Agent [AGENT-DA-01] initialized | Role: Data Access
+2026-05-17 18:51:17,330 | INFO | [AGENT-CA-01] Token generated internally (direct)
+2026-05-17 18:51:17,331 | INFO | Agent [AGENT-CA-01] initialized | Role: Cloud API
+2026-05-17 18:51:18,069 | INFO | [AGENT-AD-01] Token generated internally (direct)
+2026-05-17 18:51:18,069 | INFO | Agent [AGENT-AD-01] initialized | Role: Adversary
+2026-05-17 18:51:18,083 | INFO | Classical vs PQC comparison running
+2026-05-17 18:51:49,956 | INFO | [AGENT-AD-01] Calling LLM: openrouter/free
+2026-05-17 18:51:53,318 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 19:01:46,852 | INFO | [AGENT-ST-01] Token generated internally (direct)
+2026-05-17 19:01:46,861 | INFO | Agent [AGENT-ST-01] initialized | Role: Sentinel
+2026-05-17 19:01:46,870 | INFO | Anomaly Detection model loaded successfully
+2026-05-17 19:01:47,631 | INFO | [AGENT-AR-01] Token generated internally (direct)
+2026-05-17 19:01:47,632 | INFO | Agent [AGENT-AR-01] initialized | Role: Arbiter
+2026-05-17 19:01:48,471 | INFO | [AGENT-DA-01] Token generated internally (direct)
+2026-05-17 19:01:48,472 | INFO | Agent [AGENT-DA-01] initialized | Role: Data Access
+2026-05-17 19:01:49,250 | INFO | [AGENT-CA-01] Token generated internally (direct)
+2026-05-17 19:01:49,250 | INFO | Agent [AGENT-CA-01] initialized | Role: Cloud API
+2026-05-17 19:01:50,108 | INFO | [AGENT-AD-01] Token generated internally (direct)
+2026-05-17 19:01:50,109 | INFO | Agent [AGENT-AD-01] initialized | Role: Adversary
+2026-05-17 19:01:50,118 | INFO | Classical vs PQC comparison running
+2026-05-17 19:01:50,211 | INFO | Classical vs PQC comparison running
+2026-05-17 19:02:03,080 | INFO | [AGENT-AD-01] Calling LLM: openrouter/free
+2026-05-17 19:02:06,082 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 19:06:24,814 | INFO | [AGENT-ST-01] Token generated internally (direct)
+2026-05-17 19:06:24,815 | INFO | Agent [AGENT-ST-01] initialized | Role: Sentinel
+2026-05-17 19:06:24,823 | INFO | Anomaly Detection model loaded successfully
+2026-05-17 19:06:25,595 | INFO | [AGENT-AR-01] Token generated internally (direct)
+2026-05-17 19:06:25,596 | INFO | Agent [AGENT-AR-01] initialized | Role: Arbiter
+2026-05-17 19:06:26,407 | INFO | [AGENT-DA-01] Token generated internally (direct)
+2026-05-17 19:06:26,407 | INFO | Agent [AGENT-DA-01] initialized | Role: Data Access
+2026-05-17 19:06:27,209 | INFO | [AGENT-CA-01] Token generated internally (direct)
+2026-05-17 19:06:27,209 | INFO | Agent [AGENT-CA-01] initialized | Role: Cloud API
+2026-05-17 19:06:28,055 | INFO | [AGENT-AD-01] Token generated internally (direct)
+2026-05-17 19:06:28,055 | INFO | Agent [AGENT-AD-01] initialized | Role: Adversary
+2026-05-17 19:06:28,120 | INFO | Classical vs PQC comparison running
+2026-05-17 19:06:28,178 | INFO | Classical vs PQC comparison running
+2026-05-17 19:06:38,212 | INFO | [AGENT-AD-01] Calling LLM: openrouter/free
+2026-05-17 19:06:41,716 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 19:07:18,228 | INFO | [AGENT-AD-01] Calling LLM: openrouter/free
+2026-05-17 19:07:19,835 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 19:47:26,706 | INFO | [MessageBus] Initialized — Agent communication ready
+2026-05-17 19:47:33,180 | INFO | [MessageBus] Initialized — Agent communication ready
+2026-05-17 19:47:37,960 | INFO | [AGENT-ST-01] Token generated internally (direct)
+2026-05-17 19:47:37,961 | INFO | [MessageBus] AGENT-ST-01 subscribed for messages
+2026-05-17 19:47:37,961 | INFO | Agent [AGENT-ST-01] initialized | Role: Sentinel
+2026-05-17 19:47:37,969 | INFO | Anomaly Detection model loaded successfully
+2026-05-17 19:47:37,970 | INFO | [AGENT-ST-01] Background loop started
+2026-05-17 19:47:37,971 | INFO | [AGENT-ST-01] Background thread started (interval: 15s)
+2026-05-17 19:47:37,971 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 19:47:38,587 | INFO | [AGENT-AD-01] Token generated internally (direct)
+2026-05-17 19:47:38,588 | INFO | [MessageBus] AGENT-AD-01 subscribed for messages
+2026-05-17 19:47:38,588 | INFO | Agent [AGENT-AD-01] initialized | Role: Adversary
+2026-05-17 19:47:38,589 | INFO | [AGENT-AD-01] Background loop started
+2026-05-17 19:47:38,589 | INFO | [AGENT-AD-01] Background thread started (interval: 30s)
+2026-05-17 19:47:38,589 | INFO | [Adversary BG] Simulating: api_flooding
+2026-05-17 19:47:38,590 | INFO | [Sentinel] Adversary reference connected — direct communication ready
+2026-05-17 19:47:38,590 | WARNING | 🚨 THREAT | [Adversary BG] API Flooding simulated — BLOCKED by Arbiter
+2026-05-17 19:47:38,590 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 19:47:38,591 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 19:47:40,425 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 19:47:40,426 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'api_flooding', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779029258.5907047}
+2026-05-17 19:47:40,426 | INFO | [Sentinel] Background cycle complete
+2026-05-17 19:47:55,427 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 19:47:57,914 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 19:47:57,915 | INFO | [Sentinel] Background cycle complete
+2026-05-17 19:48:08,591 | INFO | [Adversary BG] Simulating: privilege_escalation
+2026-05-17 19:48:08,592 | WARNING | 🚨 THREAT | [Adversary BG] Privilege Escalation simulated — BLOCKED by Permission Matrix
+2026-05-17 19:48:08,592 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 19:48:08,593 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 19:48:12,916 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 19:48:15,210 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 19:48:15,211 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'privilege_escalation', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779029288.592762}
+2026-05-17 19:48:15,211 | INFO | [Sentinel] Background cycle complete
+2026-05-17 19:48:30,212 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 19:48:32,522 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 19:48:32,522 | INFO | [Sentinel] Background cycle complete
+2026-05-17 19:48:38,594 | INFO | [Adversary BG] Simulating: api_flooding
+2026-05-17 19:48:38,594 | WARNING | 🚨 THREAT | [Adversary BG] API Flooding simulated — BLOCKED by Arbiter
+2026-05-17 19:48:38,595 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 19:48:38,595 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 19:48:47,528 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 19:48:49,616 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 19:48:49,616 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'api_flooding', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779029318.5951111}
+2026-05-17 19:48:49,617 | INFO | [Sentinel] Background cycle complete
+2026-05-17 19:48:50,689 | INFO | [AGENT-AR-01] Token generated internally (direct)
+2026-05-17 19:48:50,690 | INFO | [MessageBus] AGENT-AR-01 subscribed for messages
+2026-05-17 19:48:50,690 | INFO | Agent [AGENT-AR-01] initialized | Role: Arbiter
+2026-05-17 19:48:51,504 | INFO | [AGENT-DA-01] Token generated internally (direct)
+2026-05-17 19:48:51,504 | INFO | [MessageBus] AGENT-DA-01 subscribed for messages
+2026-05-17 19:48:51,505 | INFO | Agent [AGENT-DA-01] initialized | Role: Data Access
+2026-05-17 19:48:52,313 | INFO | [AGENT-CA-01] Token generated internally (direct)
+2026-05-17 19:48:52,313 | INFO | [MessageBus] AGENT-CA-01 subscribed for messages
+2026-05-17 19:48:52,314 | INFO | Agent [AGENT-CA-01] initialized | Role: Cloud API
+2026-05-17 19:48:52,388 | INFO | Classical vs PQC comparison running
+2026-05-17 19:48:52,440 | INFO | Classical vs PQC comparison running
+2026-05-17 19:49:04,618 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 19:49:06,820 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 19:49:06,821 | INFO | [Sentinel] Background cycle complete
+2026-05-17 19:49:08,596 | INFO | [Adversary BG] Simulating: api_flooding
+2026-05-17 19:49:08,597 | WARNING | 🚨 THREAT | [Adversary BG] API Flooding simulated — BLOCKED by Arbiter
+2026-05-17 19:49:08,597 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 19:49:08,597 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 19:49:11,718 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 19:49:11,719 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 19:49:13,484 | INFO | [AGENT-AD-01] Calling LLM: openrouter/free
+2026-05-17 19:49:17,346 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 19:49:19,799 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 19:49:19,799 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 19:49:21,822 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 19:49:24,314 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 19:49:24,315 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'api_flooding', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779029348.597319}
+2026-05-17 19:49:24,316 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'API Flooding', 'request_count': 10, 'timestamp': 1779029351.7185323}
+2026-05-17 19:49:24,316 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'Token Hijacking', 'target': 'AGENT-AR-01', 'timestamp': 1779029359.7990866}
+2026-05-17 19:49:24,316 | INFO | [Sentinel] Background cycle complete
+2026-05-17 19:49:29,847 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 19:49:29,847 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 19:49:32,068 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 19:49:32,069 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 19:49:37,295 | INFO | [AGENT-AD-01] Calling LLM: openrouter/free
+2026-05-17 19:49:38,336 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 19:49:38,598 | INFO | [Adversary BG] Simulating: brute_force
+2026-05-17 19:49:38,598 | WARNING | 🚨 THREAT | [Adversary BG] Brute Force simulated — BLOCKED by rate limit
+2026-05-17 19:49:38,599 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 19:49:38,599 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 19:49:39,318 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 19:49:41,259 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 19:49:41,260 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 19:49:41,820 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 19:49:41,821 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'API Flooding', 'request_count': 10, 'timestamp': 1779029369.846936}
+2026-05-17 19:49:41,821 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'Brute Force', 'attempts': 5, 'timestamp': 1779029372.0684345}
+2026-05-17 19:49:41,822 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'brute_force', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779029378.5991662}
+2026-05-17 19:49:41,823 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'Token Hijacking', 'target': 'AGENT-AR-01', 'timestamp': 1779029381.2596567}
+2026-05-17 19:49:41,823 | INFO | [Sentinel] Background cycle complete
+2026-05-17 19:49:48,661 | INFO | Sentinel analyzing: [AGENT-ST-01] → [dashboard_check]
+2026-05-17 19:49:48,662 | INFO | [AGENT-ST-01] Authentication successful
+2026-05-17 19:49:48,663 | ERROR | ❌ ERROR | ML error: X has 7 features, but StandardScaler is expecting 5 features as input. — using rules
+2026-05-17 19:49:48,663 | INFO | ML Detection: [AGENT-ST-01] → Normal | Risk: 0.1
+2026-05-17 19:49:48,664 | INFO | [AGENT-ST-01] Behavior NORMAL | Risk: 0.1
+2026-05-17 19:49:48,664 | INFO | [MessageBus] MESSAGE | AGENT-ST-01 → AGENT-ST-01 | INFO
+2026-05-17 19:49:48,665 | INFO | [AGENT-ST-01] Message from [AGENT-ST-01] | Type: INFO
+2026-05-17 19:49:56,824 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 19:49:59,315 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 19:49:59,316 | INFO | [Sentinel] Background cycle complete
+2026-05-17 19:50:08,600 | INFO | [Adversary BG] Simulating: brute_force
+2026-05-17 19:50:08,600 | WARNING | 🚨 THREAT | [Adversary BG] Brute Force simulated — BLOCKED by rate limit
+2026-05-17 19:50:08,601 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 19:50:08,601 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 19:50:14,317 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 19:50:16,514 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 19:50:16,514 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'brute_force', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779029408.6009731}
+2026-05-17 19:50:16,514 | INFO | [Sentinel] Background cycle complete
+2026-05-17 19:50:31,515 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 19:50:33,717 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 19:50:33,717 | INFO | [Sentinel] Background cycle complete
+2026-05-17 19:50:38,601 | INFO | [Adversary BG] Simulating: api_flooding
+2026-05-17 19:50:38,602 | WARNING | 🚨 THREAT | [Adversary BG] API Flooding simulated — BLOCKED by Arbiter
+2026-05-17 19:50:38,602 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 19:50:38,602 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 19:50:48,718 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 19:50:51,114 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 19:50:51,114 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'api_flooding', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779029438.602384}
+2026-05-17 19:50:51,114 | INFO | [Sentinel] Background cycle complete
+2026-05-17 19:51:06,115 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 19:51:08,518 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 19:51:08,518 | INFO | [Sentinel] Background cycle complete
+2026-05-17 19:51:08,603 | INFO | [Adversary BG] Simulating: token_hijacking
+2026-05-17 19:51:08,603 | WARNING | 🚨 THREAT | [Adversary BG] Token Hijacking simulated — BLOCKED by PQC
+2026-05-17 19:51:08,603 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 19:51:08,604 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 19:51:23,519 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 19:51:25,717 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 19:51:25,717 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'token_hijacking', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779029468.6039326}
+2026-05-17 19:51:25,718 | INFO | [Sentinel] Background cycle complete
+2026-05-17 19:51:38,604 | INFO | [Adversary BG] Simulating: privilege_escalation
+2026-05-17 19:51:38,605 | WARNING | 🚨 THREAT | [Adversary BG] Privilege Escalation simulated — BLOCKED by Permission Matrix
+2026-05-17 19:51:38,605 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 19:51:38,605 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:02:04,807 | INFO | [MessageBus] Initialized — Agent communication ready
+2026-05-17 20:02:11,321 | INFO | [MessageBus] Initialized — Agent communication ready
+2026-05-17 20:02:16,336 | INFO | [AGENT-ST-01] Token generated internally (direct)
+2026-05-17 20:02:16,337 | INFO | [MessageBus] AGENT-ST-01 subscribed for messages
+2026-05-17 20:02:16,337 | INFO | Agent [AGENT-ST-01] initialized | Role: Sentinel
+2026-05-17 20:02:16,347 | INFO | Anomaly Detection model loaded successfully
+2026-05-17 20:02:16,349 | INFO | [AGENT-ST-01] Background loop started
+2026-05-17 20:02:16,349 | INFO | [AGENT-ST-01] Background thread started (interval: 15s)
+2026-05-17 20:02:16,349 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:02:17,006 | INFO | [AGENT-AD-01] Token generated internally (direct)
+2026-05-17 20:02:17,006 | INFO | [MessageBus] AGENT-AD-01 subscribed for messages
+2026-05-17 20:02:17,007 | INFO | Agent [AGENT-AD-01] initialized | Role: Adversary
+2026-05-17 20:02:17,008 | INFO | [AGENT-AD-01] Background loop started
+2026-05-17 20:02:17,008 | INFO | [AGENT-AD-01] Background thread started (interval: 30s)
+2026-05-17 20:02:17,008 | INFO | [Adversary BG] Simulating: api_flooding
+2026-05-17 20:02:17,009 | INFO | [Sentinel] Adversary reference connected — direct communication ready
+2026-05-17 20:02:17,009 | WARNING | 🚨 THREAT | [Adversary BG] API Flooding simulated — BLOCKED by Arbiter
+2026-05-17 20:02:17,009 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:02:17,010 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:02:18,402 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:02:18,403 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'api_flooding', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779030137.0098789}
+2026-05-17 20:02:18,403 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:02:33,404 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:02:35,443 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:02:35,444 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:02:47,011 | INFO | [Adversary BG] Simulating: api_flooding
+2026-05-17 20:02:47,011 | WARNING | 🚨 THREAT | [Adversary BG] API Flooding simulated — BLOCKED by Arbiter
+2026-05-17 20:02:47,012 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:02:47,012 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:02:50,445 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:02:52,500 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:02:52,501 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'api_flooding', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779030167.0121224}
+2026-05-17 20:02:52,501 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:03:01,386 | INFO | [AGENT-AR-01] Token generated internally (direct)
+2026-05-17 20:03:01,387 | INFO | [MessageBus] AGENT-AR-01 subscribed for messages
+2026-05-17 20:03:01,387 | INFO | Agent [AGENT-AR-01] initialized | Role: Arbiter
+2026-05-17 20:03:02,277 | INFO | [AGENT-DA-01] Token generated internally (direct)
+2026-05-17 20:03:02,277 | INFO | [MessageBus] AGENT-DA-01 subscribed for messages
+2026-05-17 20:03:02,278 | INFO | Agent [AGENT-DA-01] initialized | Role: Data Access
+2026-05-17 20:03:03,158 | INFO | [AGENT-CA-01] Token generated internally (direct)
+2026-05-17 20:03:03,159 | INFO | [MessageBus] AGENT-CA-01 subscribed for messages
+2026-05-17 20:03:03,159 | INFO | Agent [AGENT-CA-01] initialized | Role: Cloud API
+2026-05-17 20:03:03,246 | INFO | Classical vs PQC comparison running
+2026-05-17 20:03:03,300 | INFO | Classical vs PQC comparison running
+2026-05-17 20:03:07,502 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:03:09,541 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:03:09,542 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:03:17,013 | INFO | [Adversary BG] Simulating: api_flooding
+2026-05-17 20:03:17,013 | WARNING | 🚨 THREAT | [Adversary BG] API Flooding simulated — BLOCKED by Arbiter
+2026-05-17 20:03:17,014 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:03:17,015 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:03:24,543 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:03:26,583 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:03:26,584 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'api_flooding', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779030197.0144193}
+2026-05-17 20:03:26,584 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:03:27,597 | INFO | [AGENT-AD-01] Calling LLM: openrouter/free
+2026-05-17 20:03:31,108 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 20:03:32,751 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:03:32,751 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:03:35,132 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:03:35,133 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:03:37,398 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:03:37,399 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:03:41,586 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:03:43,627 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:03:43,628 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'Token Hijacking', 'target': 'AGENT-AR-01', 'timestamp': 1779030212.751263}
+2026-05-17 20:03:43,629 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'Brute Force', 'attempts': 5, 'timestamp': 1779030215.1327055}
+2026-05-17 20:03:43,629 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'API Flooding', 'request_count': 10, 'timestamp': 1779030217.3988075}
+2026-05-17 20:03:43,630 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:03:47,016 | INFO | [Adversary BG] Simulating: api_flooding
+2026-05-17 20:03:47,017 | WARNING | 🚨 THREAT | [Adversary BG] API Flooding simulated — BLOCKED by Arbiter
+2026-05-17 20:03:47,018 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:03:47,018 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:03:58,631 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:04:00,805 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:04:00,805 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'api_flooding', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779030227.0181706}
+2026-05-17 20:04:00,805 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:04:15,807 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:04:17,019 | INFO | [Adversary BG] Simulating: brute_force
+2026-05-17 20:04:17,020 | WARNING | 🚨 THREAT | [Adversary BG] Brute Force simulated — BLOCKED by rate limit
+2026-05-17 20:04:17,020 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:04:17,020 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:11:58,791 | INFO | [MessageBus] Initialized — Agent communication ready
+2026-05-17 20:12:05,241 | INFO | [MessageBus] Initialized — Agent communication ready
+2026-05-17 20:12:10,433 | INFO | [AGENT-ST-01] Token generated internally (direct)
+2026-05-17 20:12:10,434 | INFO | [MessageBus] AGENT-ST-01 subscribed for messages
+2026-05-17 20:12:10,434 | INFO | Agent [AGENT-ST-01] initialized | Role: Sentinel
+2026-05-17 20:12:10,446 | INFO | Anomaly Detection model loaded successfully
+2026-05-17 20:12:10,447 | INFO | [AGENT-ST-01] Background loop started
+2026-05-17 20:12:10,447 | INFO | [AGENT-ST-01] Background thread started (interval: 15s)
+2026-05-17 20:12:10,447 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:12:11,162 | INFO | [AGENT-AD-01] Token generated internally (direct)
+2026-05-17 20:12:11,162 | INFO | [MessageBus] AGENT-AD-01 subscribed for messages
+2026-05-17 20:12:11,163 | INFO | Agent [AGENT-AD-01] initialized | Role: Adversary
+2026-05-17 20:12:11,164 | INFO | [AGENT-AD-01] Background loop started
+2026-05-17 20:12:11,164 | INFO | [AGENT-AD-01] Background thread started (interval: 30s)
+2026-05-17 20:12:11,164 | INFO | [Adversary BG] Simulating: privilege_escalation
+2026-05-17 20:12:11,165 | INFO | [Sentinel] Adversary reference connected — direct communication ready
+2026-05-17 20:12:11,165 | WARNING | 🚨 THREAT | [Adversary BG] Privilege Escalation simulated — BLOCKED by Permission Matrix
+2026-05-17 20:12:11,166 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:12:11,166 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:12:12,503 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:12:12,504 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'privilege_escalation', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779030731.166015}
+2026-05-17 20:12:12,504 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:12:27,505 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:12:29,635 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:12:29,635 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:12:41,167 | INFO | [Adversary BG] Simulating: brute_force
+2026-05-17 20:12:41,168 | WARNING | 🚨 THREAT | [Adversary BG] Brute Force simulated — BLOCKED by rate limit
+2026-05-17 20:12:41,168 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:12:41,168 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:12:44,636 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:12:46,667 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:12:46,668 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'brute_force', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779030761.168635}
+2026-05-17 20:12:46,668 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:13:01,669 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:13:03,709 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:13:03,709 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:13:11,169 | INFO | [Adversary BG] Simulating: api_flooding
+2026-05-17 20:13:11,170 | WARNING | 🚨 THREAT | [Adversary BG] API Flooding simulated — BLOCKED by Arbiter
+2026-05-17 20:13:11,170 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:13:11,170 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:13:18,710 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:13:20,743 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:13:20,744 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'api_flooding', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779030791.170363}
+2026-05-17 20:13:20,744 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:13:35,745 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:13:38,108 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:13:38,108 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:13:41,171 | INFO | [Adversary BG] Simulating: token_hijacking
+2026-05-17 20:13:41,171 | WARNING | 🚨 THREAT | [Adversary BG] Token Hijacking simulated — BLOCKED by PQC
+2026-05-17 20:13:41,172 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:13:41,172 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:13:53,110 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:13:55,144 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:13:55,144 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'token_hijacking', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779030821.1722724}
+2026-05-17 20:13:55,145 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:14:10,146 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:14:11,173 | INFO | [Adversary BG] Simulating: token_hijacking
+2026-05-17 20:14:11,174 | WARNING | 🚨 THREAT | [Adversary BG] Token Hijacking simulated — BLOCKED by PQC
+2026-05-17 20:14:11,174 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:14:11,175 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:14:12,197 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:14:12,197 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'token_hijacking', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779030851.1745787}
+2026-05-17 20:14:12,197 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:14:27,199 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:14:29,427 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:14:29,428 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:14:32,445 | INFO | [AGENT-AR-01] Token generated internally (direct)
+2026-05-17 20:14:32,445 | INFO | [MessageBus] AGENT-AR-01 subscribed for messages
+2026-05-17 20:14:32,448 | INFO | Agent [AGENT-AR-01] initialized | Role: Arbiter
+2026-05-17 20:14:33,771 | INFO | [AGENT-DA-01] Token generated internally (direct)
+2026-05-17 20:14:33,773 | INFO | [MessageBus] AGENT-DA-01 subscribed for messages
+2026-05-17 20:14:33,774 | INFO | Agent [AGENT-DA-01] initialized | Role: Data Access
+2026-05-17 20:14:35,109 | INFO | [AGENT-CA-01] Token generated internally (direct)
+2026-05-17 20:14:35,116 | INFO | [MessageBus] AGENT-CA-01 subscribed for messages
+2026-05-17 20:14:35,119 | INFO | Agent [AGENT-CA-01] initialized | Role: Cloud API
+2026-05-17 20:14:35,378 | INFO | Classical vs PQC comparison running
+2026-05-17 20:14:35,479 | INFO | Classical vs PQC comparison running
+2026-05-17 20:14:41,176 | INFO | [Adversary BG] Simulating: api_flooding
+2026-05-17 20:14:41,177 | WARNING | 🚨 THREAT | [Adversary BG] API Flooding simulated — BLOCKED by Arbiter
+2026-05-17 20:14:41,178 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:14:41,178 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:14:44,430 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:14:46,963 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:14:46,964 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'api_flooding', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779030881.178382}
+2026-05-17 20:14:46,965 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:15:01,967 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:15:04,316 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:15:04,317 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:15:10,286 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:15:10,288 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:15:11,179 | INFO | [Adversary BG] Simulating: brute_force
+2026-05-17 20:15:11,180 | WARNING | 🚨 THREAT | [Adversary BG] Brute Force simulated — BLOCKED by rate limit
+2026-05-17 20:15:11,180 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:15:11,181 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:15:12,649 | INFO | [AGENT-AD-01] Calling LLM: openrouter/free
+2026-05-17 20:15:17,297 | INFO | HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-17 20:15:18,652 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:15:18,655 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:15:19,186 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:15:19,190 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:15:19,318 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:15:21,749 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:15:21,750 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'API Flooding', 'request_count': 10, 'timestamp': 1779030910.2866027}
+2026-05-17 20:15:21,751 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'brute_force', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779030911.1808152}
+2026-05-17 20:15:21,752 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'Token Hijacking', 'target': 'AGENT-AR-01', 'timestamp': 1779030918.6520443}
+2026-05-17 20:15:21,752 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'Brute Force', 'attempts': 5, 'timestamp': 1779030919.1865056}
+2026-05-17 20:15:21,753 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:15:36,755 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:15:39,036 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:15:39,037 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:15:41,181 | INFO | [Adversary BG] Simulating: token_hijacking
+2026-05-17 20:15:41,182 | WARNING | 🚨 THREAT | [Adversary BG] Token Hijacking simulated — BLOCKED by PQC
+2026-05-17 20:15:41,182 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:15:41,183 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:15:54,038 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:15:56,064 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:15:56,065 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'token_hijacking', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779030941.182765}
+2026-05-17 20:15:56,065 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:16:11,066 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:16:11,184 | INFO | [Adversary BG] Simulating: brute_force
+2026-05-17 20:16:11,185 | WARNING | 🚨 THREAT | [Adversary BG] Brute Force simulated — BLOCKED by rate limit
+2026-05-17 20:16:11,185 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:16:11,185 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:16:13,109 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:16:13,109 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'brute_force', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779030971.1856017}
+2026-05-17 20:16:13,110 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:16:28,111 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:16:30,135 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:16:30,135 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:16:41,186 | INFO | [Adversary BG] Simulating: brute_force
+2026-05-17 20:16:41,187 | WARNING | 🚨 THREAT | [Adversary BG] Brute Force simulated — BLOCKED by rate limit
+2026-05-17 20:16:41,187 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:16:41,187 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:16:45,136 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:16:47,168 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:16:47,169 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'brute_force', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031001.18728}
+2026-05-17 20:16:47,169 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:17:02,170 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:17:04,205 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:17:04,206 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:17:11,188 | INFO | [Adversary BG] Simulating: privilege_escalation
+2026-05-17 20:17:11,189 | WARNING | 🚨 THREAT | [Adversary BG] Privilege Escalation simulated — BLOCKED by Permission Matrix
+2026-05-17 20:17:11,189 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:17:11,190 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:17:19,207 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:17:21,696 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:17:21,696 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'privilege_escalation', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031031.1895757}
+2026-05-17 20:17:21,697 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:17:36,697 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:17:38,742 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:17:38,743 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:17:41,190 | INFO | [Adversary BG] Simulating: privilege_escalation
+2026-05-17 20:17:41,191 | WARNING | 🚨 THREAT | [Adversary BG] Privilege Escalation simulated — BLOCKED by Permission Matrix
+2026-05-17 20:17:41,191 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:17:41,191 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:17:53,744 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:17:55,790 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:17:55,791 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'privilege_escalation', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031061.1916113}
+2026-05-17 20:17:55,791 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:18:10,792 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:18:11,192 | INFO | [Adversary BG] Simulating: token_hijacking
+2026-05-17 20:18:11,193 | WARNING | 🚨 THREAT | [Adversary BG] Token Hijacking simulated — BLOCKED by PQC
+2026-05-17 20:18:11,193 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:18:11,193 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:18:12,831 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:18:12,832 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'token_hijacking', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031091.1934476}
+2026-05-17 20:18:12,832 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:18:27,833 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:18:29,884 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:18:29,884 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:18:41,194 | INFO | [Adversary BG] Simulating: brute_force
+2026-05-17 20:18:41,194 | WARNING | 🚨 THREAT | [Adversary BG] Brute Force simulated — BLOCKED by rate limit
+2026-05-17 20:18:41,195 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:18:41,195 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:18:44,885 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:18:46,951 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:18:46,958 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'brute_force', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031121.1949983}
+2026-05-17 20:18:46,958 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:19:01,960 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:19:04,004 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:19:04,004 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:19:11,195 | INFO | [Adversary BG] Simulating: token_hijacking
+2026-05-17 20:19:11,196 | WARNING | 🚨 THREAT | [Adversary BG] Token Hijacking simulated — BLOCKED by PQC
+2026-05-17 20:19:11,196 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:19:11,197 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:19:19,006 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:19:21,063 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:19:21,063 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'token_hijacking', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031151.1967046}
+2026-05-17 20:19:21,064 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:19:36,064 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:19:38,099 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:19:38,100 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:19:41,197 | INFO | [Adversary BG] Simulating: api_flooding
+2026-05-17 20:19:41,198 | WARNING | 🚨 THREAT | [Adversary BG] API Flooding simulated — BLOCKED by Arbiter
+2026-05-17 20:19:41,199 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:19:41,199 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:19:53,101 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:19:55,131 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:19:55,132 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'api_flooding', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031181.1994052}
+2026-05-17 20:19:55,132 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:20:10,133 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:20:11,200 | INFO | [Adversary BG] Simulating: brute_force
+2026-05-17 20:20:11,200 | WARNING | 🚨 THREAT | [Adversary BG] Brute Force simulated — BLOCKED by rate limit
+2026-05-17 20:20:11,201 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:20:11,201 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:20:12,311 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:20:12,312 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'brute_force', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031211.2014563}
+2026-05-17 20:20:12,313 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:20:27,314 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:20:29,383 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:20:29,383 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:20:41,202 | INFO | [Adversary BG] Simulating: api_flooding
+2026-05-17 20:20:41,202 | WARNING | 🚨 THREAT | [Adversary BG] API Flooding simulated — BLOCKED by Arbiter
+2026-05-17 20:20:41,203 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:20:41,203 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:20:44,384 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:20:46,827 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:20:46,827 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'api_flooding', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031241.2032363}
+2026-05-17 20:20:46,828 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:21:01,829 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:21:03,884 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:21:03,884 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:21:11,204 | INFO | [Adversary BG] Simulating: brute_force
+2026-05-17 20:21:11,204 | WARNING | 🚨 THREAT | [Adversary BG] Brute Force simulated — BLOCKED by rate limit
+2026-05-17 20:21:11,205 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:21:11,205 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:21:18,885 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:21:21,135 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:21:21,135 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'brute_force', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031271.2051847}
+2026-05-17 20:21:21,136 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:21:36,137 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:21:38,166 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:21:38,167 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:21:41,206 | INFO | [Adversary BG] Simulating: token_hijacking
+2026-05-17 20:21:41,206 | WARNING | 🚨 THREAT | [Adversary BG] Token Hijacking simulated — BLOCKED by PQC
+2026-05-17 20:21:41,207 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:21:41,207 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:21:53,168 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:21:55,812 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:21:55,812 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'token_hijacking', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031301.2069845}
+2026-05-17 20:21:55,812 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:22:10,813 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:22:11,208 | INFO | [Adversary BG] Simulating: privilege_escalation
+2026-05-17 20:22:11,208 | WARNING | 🚨 THREAT | [Adversary BG] Privilege Escalation simulated — BLOCKED by Permission Matrix
+2026-05-17 20:22:11,208 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:22:11,209 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:22:12,838 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:22:12,838 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'privilege_escalation', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031331.2087498}
+2026-05-17 20:22:12,839 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:22:27,840 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:22:30,221 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:22:30,222 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:22:41,209 | INFO | [Adversary BG] Simulating: brute_force
+2026-05-17 20:22:41,210 | WARNING | 🚨 THREAT | [Adversary BG] Brute Force simulated — BLOCKED by rate limit
+2026-05-17 20:22:41,210 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:22:41,210 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:22:45,223 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:22:47,275 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:22:47,276 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'brute_force', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031361.2103782}
+2026-05-17 20:22:47,276 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:23:02,277 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:23:04,317 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:23:04,318 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:23:11,211 | INFO | [Adversary BG] Simulating: brute_force
+2026-05-17 20:23:11,211 | WARNING | 🚨 THREAT | [Adversary BG] Brute Force simulated — BLOCKED by rate limit
+2026-05-17 20:23:11,212 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:23:11,212 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:23:19,318 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:23:21,393 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:23:21,393 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'brute_force', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031391.2120454}
+2026-05-17 20:23:21,394 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:23:36,395 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:23:38,431 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:23:38,431 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:23:41,212 | INFO | [Adversary BG] Simulating: token_hijacking
+2026-05-17 20:23:41,213 | WARNING | 🚨 THREAT | [Adversary BG] Token Hijacking simulated — BLOCKED by PQC
+2026-05-17 20:23:41,213 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:23:41,214 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:23:53,432 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:23:55,805 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:23:55,806 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'token_hijacking', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031421.213717}
+2026-05-17 20:23:55,806 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:24:10,807 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:24:11,214 | INFO | [Adversary BG] Simulating: api_flooding
+2026-05-17 20:24:11,214 | WARNING | 🚨 THREAT | [Adversary BG] API Flooding simulated — BLOCKED by Arbiter
+2026-05-17 20:24:11,215 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:24:11,215 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:24:12,825 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:24:12,826 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'api_flooding', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031451.2152443}
+2026-05-17 20:24:12,826 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:24:27,827 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:24:29,884 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:24:29,884 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:24:41,216 | INFO | [Adversary BG] Simulating: brute_force
+2026-05-17 20:24:41,216 | WARNING | 🚨 THREAT | [Adversary BG] Brute Force simulated — BLOCKED by rate limit
+2026-05-17 20:24:41,216 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:24:41,217 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:24:44,885 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:24:47,100 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:24:47,100 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'brute_force', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031481.216835}
+2026-05-17 20:24:47,101 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:25:02,101 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:25:04,135 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:25:04,135 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:25:11,217 | INFO | [Adversary BG] Simulating: privilege_escalation
+2026-05-17 20:25:11,218 | WARNING | 🚨 THREAT | [Adversary BG] Privilege Escalation simulated — BLOCKED by Permission Matrix
+2026-05-17 20:25:11,218 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:25:11,219 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:25:19,136 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:25:21,182 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:25:21,183 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'privilege_escalation', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031511.2186825}
+2026-05-17 20:25:21,183 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:25:36,184 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:25:38,225 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:25:38,225 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:25:41,219 | INFO | [Adversary BG] Simulating: token_hijacking
+2026-05-17 20:25:41,220 | WARNING | 🚨 THREAT | [Adversary BG] Token Hijacking simulated — BLOCKED by PQC
+2026-05-17 20:25:41,220 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:25:41,220 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:25:53,226 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:25:55,272 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:25:55,273 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'token_hijacking', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031541.2206774}
+2026-05-17 20:25:55,273 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:26:10,274 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:26:11,221 | INFO | [Adversary BG] Simulating: token_hijacking
+2026-05-17 20:26:11,221 | WARNING | 🚨 THREAT | [Adversary BG] Token Hijacking simulated — BLOCKED by PQC
+2026-05-17 20:26:11,222 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:26:11,222 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:26:12,533 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:26:12,533 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'token_hijacking', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031571.2222786}
+2026-05-17 20:26:12,534 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:26:27,534 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:26:29,576 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:26:29,577 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:26:41,223 | INFO | [Adversary BG] Simulating: brute_force
+2026-05-17 20:26:41,224 | WARNING | 🚨 THREAT | [Adversary BG] Brute Force simulated — BLOCKED by rate limit
+2026-05-17 20:26:41,224 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:26:41,224 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:26:44,578 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:26:46,823 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:26:46,824 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'brute_force', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031601.2245803}
+2026-05-17 20:26:46,824 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:27:01,825 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:27:04,137 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:27:04,138 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:27:11,225 | INFO | [Adversary BG] Simulating: api_flooding
+2026-05-17 20:27:11,225 | WARNING | 🚨 THREAT | [Adversary BG] API Flooding simulated — BLOCKED by Arbiter
+2026-05-17 20:27:11,226 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:27:11,226 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:27:19,139 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:27:21,164 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:27:21,165 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'api_flooding', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031631.226113}
+2026-05-17 20:27:21,165 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:27:36,166 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:27:38,236 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:27:38,237 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:27:41,227 | INFO | [Adversary BG] Simulating: api_flooding
+2026-05-17 20:27:41,227 | WARNING | 🚨 THREAT | [Adversary BG] API Flooding simulated — BLOCKED by Arbiter
+2026-05-17 20:27:41,228 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:27:41,228 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:27:53,238 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:27:55,625 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:27:55,626 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'api_flooding', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031661.228253}
+2026-05-17 20:27:55,627 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:28:10,628 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:28:11,229 | INFO | [Adversary BG] Simulating: token_hijacking
+2026-05-17 20:28:11,230 | WARNING | 🚨 THREAT | [Adversary BG] Token Hijacking simulated — BLOCKED by PQC
+2026-05-17 20:28:11,231 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:28:11,231 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:28:12,648 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:28:12,649 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'token_hijacking', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031691.2310047}
+2026-05-17 20:28:12,650 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:28:27,651 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:28:29,683 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:28:29,684 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:28:41,231 | INFO | [Adversary BG] Simulating: brute_force
+2026-05-17 20:28:41,232 | WARNING | 🚨 THREAT | [Adversary BG] Brute Force simulated — BLOCKED by rate limit
+2026-05-17 20:28:41,232 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:28:41,233 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:28:44,685 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:28:46,721 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:28:46,721 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'brute_force', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031721.2327282}
+2026-05-17 20:28:46,721 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:29:01,723 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:29:03,757 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:29:03,757 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:29:11,233 | INFO | [Adversary BG] Simulating: token_hijacking
+2026-05-17 20:29:11,233 | WARNING | 🚨 THREAT | [Adversary BG] Token Hijacking simulated — BLOCKED by PQC
+2026-05-17 20:29:11,234 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:29:11,234 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:29:18,758 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:29:20,792 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:29:20,793 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'token_hijacking', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031751.2342563}
+2026-05-17 20:29:20,793 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:29:35,794 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:29:38,041 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:29:38,042 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:29:41,235 | INFO | [Adversary BG] Simulating: privilege_escalation
+2026-05-17 20:29:41,235 | WARNING | 🚨 THREAT | [Adversary BG] Privilege Escalation simulated — BLOCKED by Permission Matrix
+2026-05-17 20:29:41,235 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:29:41,236 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:29:53,043 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:29:55,083 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:29:55,083 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'privilege_escalation', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031781.2356212}
+2026-05-17 20:29:55,084 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:30:10,084 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:30:11,236 | INFO | [Adversary BG] Simulating: token_hijacking
+2026-05-17 20:30:11,237 | WARNING | 🚨 THREAT | [Adversary BG] Token Hijacking simulated — BLOCKED by PQC
+2026-05-17 20:30:11,237 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:30:11,237 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:30:12,128 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:30:12,128 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'token_hijacking', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031811.2375445}
+2026-05-17 20:30:12,128 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:30:27,129 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:30:29,528 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:30:29,529 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:30:41,238 | INFO | [Adversary BG] Simulating: token_hijacking
+2026-05-17 20:30:41,238 | WARNING | 🚨 THREAT | [Adversary BG] Token Hijacking simulated — BLOCKED by PQC
+2026-05-17 20:30:41,239 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:30:41,239 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:30:44,529 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:30:46,563 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:30:46,564 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'token_hijacking', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031841.2394416}
+2026-05-17 20:30:46,564 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:31:01,565 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:31:03,609 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:31:03,609 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:31:11,240 | INFO | [Adversary BG] Simulating: api_flooding
+2026-05-17 20:31:11,241 | WARNING | 🚨 THREAT | [Adversary BG] API Flooding simulated — BLOCKED by Arbiter
+2026-05-17 20:31:11,241 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:31:11,241 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:31:18,610 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:31:21,005 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:31:21,005 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'api_flooding', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031871.2415903}
+2026-05-17 20:31:21,005 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:31:36,006 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:31:38,036 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:31:38,036 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:31:41,242 | INFO | [Adversary BG] Simulating: brute_force
+2026-05-17 20:31:41,242 | WARNING | 🚨 THREAT | [Adversary BG] Brute Force simulated — BLOCKED by rate limit
+2026-05-17 20:31:41,243 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:31:41,243 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:31:53,037 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:31:55,420 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:31:55,421 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'brute_force', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031901.243297}
+2026-05-17 20:31:55,421 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:32:10,422 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:32:11,244 | INFO | [Adversary BG] Simulating: api_flooding
+2026-05-17 20:32:11,244 | WARNING | 🚨 THREAT | [Adversary BG] API Flooding simulated — BLOCKED by Arbiter
+2026-05-17 20:32:11,245 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:32:11,245 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:32:12,831 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:32:12,831 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'api_flooding', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031931.245216}
+2026-05-17 20:32:12,832 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:32:27,832 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:32:29,864 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:32:29,865 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:32:41,246 | INFO | [Adversary BG] Simulating: api_flooding
+2026-05-17 20:32:41,246 | WARNING | 🚨 THREAT | [Adversary BG] API Flooding simulated — BLOCKED by Arbiter
+2026-05-17 20:32:41,247 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:32:41,247 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:32:44,866 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:32:46,896 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:32:46,897 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'api_flooding', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031961.247007}
+2026-05-17 20:32:46,897 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:33:01,899 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:33:03,931 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:33:03,931 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:33:11,247 | INFO | [Adversary BG] Simulating: brute_force
+2026-05-17 20:33:11,248 | WARNING | 🚨 THREAT | [Adversary BG] Brute Force simulated — BLOCKED by rate limit
+2026-05-17 20:33:11,248 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:33:11,249 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:33:18,932 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:33:21,235 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:33:21,235 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'brute_force', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779031991.248714}
+2026-05-17 20:33:21,236 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:33:36,237 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:33:38,288 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:33:38,288 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:33:41,249 | INFO | [Adversary BG] Simulating: privilege_escalation
+2026-05-17 20:33:41,250 | WARNING | 🚨 THREAT | [Adversary BG] Privilege Escalation simulated — BLOCKED by Permission Matrix
+2026-05-17 20:33:41,250 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:33:41,251 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:33:53,290 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:33:55,322 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:33:55,322 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'privilege_escalation', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779032021.2507746}
+2026-05-17 20:33:55,323 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:34:10,323 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:34:11,252 | INFO | [Adversary BG] Simulating: brute_force
+2026-05-17 20:34:11,252 | WARNING | 🚨 THREAT | [Adversary BG] Brute Force simulated — BLOCKED by rate limit
+2026-05-17 20:34:11,252 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:34:11,253 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:34:12,362 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:34:12,363 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'brute_force', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779032051.2528186}
+2026-05-17 20:34:12,363 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:34:27,364 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:34:29,409 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:34:29,409 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:34:41,253 | INFO | [Adversary BG] Simulating: api_flooding
+2026-05-17 20:34:41,254 | WARNING | 🚨 THREAT | [Adversary BG] API Flooding simulated — BLOCKED by Arbiter
+2026-05-17 20:34:41,254 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:34:41,255 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:34:44,410 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:34:46,438 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:34:46,439 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'api_flooding', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779032081.2548008}
+2026-05-17 20:34:46,439 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:35:01,440 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:35:03,487 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:35:03,488 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:35:11,255 | INFO | [Adversary BG] Simulating: api_flooding
+2026-05-17 20:35:11,256 | WARNING | 🚨 THREAT | [Adversary BG] API Flooding simulated — BLOCKED by Arbiter
+2026-05-17 20:35:11,257 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:35:11,257 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 20:35:18,488 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:35:20,537 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:35:20,537 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'api_flooding', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779032111.2573388}
+2026-05-17 20:35:20,538 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:35:35,539 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 20:35:37,578 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 20:35:37,579 | INFO | [Sentinel] Background cycle complete
+2026-05-17 20:35:41,258 | INFO | [Adversary BG] Simulating: brute_force
+2026-05-17 20:35:41,259 | WARNING | 🚨 THREAT | [Adversary BG] Brute Force simulated — BLOCKED by rate limit
+2026-05-17 20:35:41,259 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 20:35:41,260 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 21:55:46,900 | INFO | [MessageBus] Initialized — Agent communication ready
+2026-05-17 21:55:52,274 | INFO | [MessageBus] Initialized — Agent communication ready
+2026-05-17 21:56:05,400 | INFO | [AGENT-ST-01] Token generated internally (direct)
+2026-05-17 21:56:05,401 | INFO | [MessageBus] AGENT-ST-01 subscribed for messages
+2026-05-17 21:56:05,402 | INFO | Agent [AGENT-ST-01] initialized | Role: Sentinel
+2026-05-17 21:56:05,410 | INFO | Anomaly Detection model loaded successfully
+2026-05-17 21:56:05,411 | INFO | [AGENT-ST-01] Background loop started
+2026-05-17 21:56:05,411 | INFO | [AGENT-ST-01] Background thread started (interval: 15s)
+2026-05-17 21:56:05,412 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 21:56:05,860 | INFO | [AGENT-AD-01] Token generated internally (direct)
+2026-05-17 21:56:05,860 | INFO | [MessageBus] AGENT-AD-01 subscribed for messages
+2026-05-17 21:56:05,861 | INFO | Agent [AGENT-AD-01] initialized | Role: Adversary
+2026-05-17 21:56:05,862 | INFO | [AGENT-AD-01] Background loop started
+2026-05-17 21:56:05,862 | INFO | [AGENT-AD-01] Background thread started (interval: 30s)
+2026-05-17 21:56:05,863 | INFO | [Adversary BG] Simulating: brute_force
+2026-05-17 21:56:05,863 | INFO | [Sentinel] Adversary reference connected — direct communication ready
+2026-05-17 21:56:05,863 | WARNING | 🚨 THREAT | [Adversary BG] Brute Force simulated — BLOCKED by rate limit
+2026-05-17 21:56:05,864 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 21:56:05,876 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 21:56:07,516 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 21:56:07,518 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'brute_force', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779036965.8642788}
+2026-05-17 21:56:07,519 | INFO | [Sentinel] Background cycle complete
+2026-05-17 21:56:22,520 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 21:56:24,572 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 21:56:24,574 | INFO | [Sentinel] Background cycle complete
+2026-05-17 21:56:35,877 | INFO | [Adversary BG] Simulating: privilege_escalation
+2026-05-17 21:56:35,877 | WARNING | 🚨 THREAT | [Adversary BG] Privilege Escalation simulated — BLOCKED by Permission Matrix
+2026-05-17 21:56:35,878 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 21:56:35,878 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 21:56:39,576 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 21:56:41,618 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 21:56:41,619 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'privilege_escalation', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779036995.8783116}
+2026-05-17 21:56:41,619 | INFO | [Sentinel] Background cycle complete
+2026-05-17 21:56:56,620 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 21:56:58,664 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 21:56:58,664 | INFO | [Sentinel] Background cycle complete
+2026-05-17 21:57:05,879 | INFO | [Adversary BG] Simulating: token_hijacking
+2026-05-17 21:57:05,879 | WARNING | 🚨 THREAT | [Adversary BG] Token Hijacking simulated — BLOCKED by PQC
+2026-05-17 21:57:05,880 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 21:57:05,880 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 21:57:13,666 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 21:57:15,722 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 21:57:15,724 | WARNING | 🚨 THREAT | [Sentinel BG] Alert received: {'event': 'ATTACK_SIMULATED', 'attack_type': 'token_hijacking', 'agent_id': 'AGENT-AD-01', 'timestamp': 1779037025.8801785}
+2026-05-17 21:57:15,725 | INFO | [Sentinel] Background cycle complete
+2026-05-17 21:57:25,186 | INFO | [AGENT-AR-01] Token generated internally (direct)
+2026-05-17 21:57:25,186 | INFO | [MessageBus] AGENT-AR-01 subscribed for messages
+2026-05-17 21:57:25,187 | INFO | Agent [AGENT-AR-01] initialized | Role: Arbiter
+2026-05-17 21:57:26,027 | INFO | [AGENT-DA-01] Token generated internally (direct)
+2026-05-17 21:57:26,028 | INFO | [MessageBus] AGENT-DA-01 subscribed for messages
+2026-05-17 21:57:26,028 | INFO | Agent [AGENT-DA-01] initialized | Role: Data Access
+2026-05-17 21:57:26,909 | INFO | [AGENT-CA-01] Token generated internally (direct)
+2026-05-17 21:57:26,909 | INFO | [MessageBus] AGENT-CA-01 subscribed for messages
+2026-05-17 21:57:26,910 | INFO | Agent [AGENT-CA-01] initialized | Role: Cloud API
+2026-05-17 21:57:27,033 | INFO | Classical vs PQC comparison running
+2026-05-17 21:57:27,040 | INFO | Classical vs PQC comparison running
+2026-05-17 21:57:30,727 | INFO | [Sentinel] Background cycle — scanning for threats...
+2026-05-17 21:57:32,791 | INFO | [Sentinel] Fetched 20 log entries from backend
+2026-05-17 21:57:32,792 | INFO | [Sentinel] Background cycle complete
+2026-05-17 21:57:35,881 | INFO | [Adversary BG] Simulating: api_flooding
+2026-05-17 21:57:35,881 | WARNING | 🚨 THREAT | [Adversary BG] API Flooding simulated — BLOCKED by Arbiter
+2026-05-17 21:57:35,882 | INFO | [MessageBus] MESSAGE | AGENT-AD-01 → AGENT-ST-01 | ALERT
+2026-05-17 21:57:35,882 | INFO | [AGENT-ST-01] Message from [AGENT-AD-01] | Type: ALERT
+2026-05-17 21:57:47,793 | INFO | [Sentinel] Background cycle — scanning for threats...

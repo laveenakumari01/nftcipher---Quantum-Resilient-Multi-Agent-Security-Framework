@@ -1,0 +1,117 @@
+.phd-cta-section {
+  padding: 120px 0;
+  background: var(--bg);
+  position: relative;
+  z-index: 10;
+}
+
+.phd-cta-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.phd-cta-terminal {
+  background: rgba(5, 8, 15, 0.9);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  padding: 3rem;
+  position: relative;
+  clip-path: polygon(30px 0, 100% 0, 100% calc(100% - 30px), calc(100% - 30px) 100%, 0 100%, 0 30px);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.8), inset 0 0 40px rgba(0,240,255,0.05);
+}
+
+.phd-cta-terminal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+  opacity: 0.5;
+}
+
+.phd-cta-header {
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--text3);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px dashed rgba(255,255,255,0.1);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.phd-cta-title {
+  font-family: var(--display);
+  font-size: 40px;
+  color: var(--text);
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.phd-cta-sub {
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--text2);
+  margin-bottom: 3rem;
+  line-height: 1.6;
+}
+
+.phd-cta-prompt {
+  background: rgba(0,0,0,0.5);
+  border: 1px solid rgba(0,240,255,0.1);
+  padding: 1.5rem;
+  font-family: var(--mono);
+  font-size: 16px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 2rem;
+}
+
+.phd-prompt-char {
+  color: var(--cyan);
+  font-weight: 800;
+}
+
+.phd-cta-btns {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.phd-cta-docs {
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--text2);
+  text-decoration: none;
+  border: 1px dashed rgba(255,255,255,0.2);
+  padding: 12px 24px;
+  transition: all 0.3s;
+  background: transparent;
+  cursor: pointer;
+}
+
+.phd-cta-docs:hover {
+  border-color: var(--cyan);
+  color: var(--cyan);
+  background: rgba(0,240,255,0.05);
+}
+
+@media (max-width: 768px) {
+  .phd-cta-terminal {
+    padding: 2rem;
+    clip-path: none;
+  }
+  .phd-cta-btns {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
