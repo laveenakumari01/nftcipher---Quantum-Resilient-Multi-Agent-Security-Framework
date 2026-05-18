@@ -267,15 +267,58 @@ def init_db():
         );
     """)
 
+    Database.execute("""
+        CREATE TABLE IF NOT EXISTS agent_registry (
+            agent_id        VARCHAR(100) PRIMARY KEY,
+            role            VARCHAR(100) NOT NULL,
+            description     TEXT,
+            capabilities    JSONB DEFAULT '[]',
+            status          VARCHAR(50)  DEFAULT 'ACTIVE',
+            autonomous      BOOLEAN      DEFAULT TRUE,
+            bg_interval_sec INTEGER      DEFAULT 15,
+            pqc_enabled     BOOLEAN      DEFAULT TRUE,
+            threat_level    VARCHAR(20)  DEFAULT 'LOW',
+            failed_attempts INTEGER      DEFAULT 0,
+            last_seen       TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+            registered_at   TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+            metadata        JSONB        DEFAULT '{}'
+        );
+    """)
+
     Database.execute("CREATE INDEX IF NOT EXISTS idx_logs_timestamp ON logs(timestamp);")
     Database.execute("CREATE INDEX IF NOT EXISTS idx_alerts_timestamp ON alerts(timestamp);")
     Database.execute("CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);")
     Database.execute("CREATE INDEX IF NOT EXISTS idx_logs_agent_id ON logs(agent_id);")
     Database.execute("CREATE INDEX IF NOT EXISTS idx_alerts_agent_id ON alerts(agent_id);")
     Database.execute("CREATE INDEX IF NOT EXISTS idx_permissions_role ON permissions(role);")
+    Database.execute("CREATE INDEX IF NOT EXISTS idx_agent_registry_status ON agent_registry(status);")
 
+    _seed_agent_registry()
     _seed_default_users()
     print("[OK] Database tables ready!")
+
+
+def _seed_agent_registry():
+    """5 autonomous agents ko agent_registry mein seed karo."""
+    agents = [
+        ("AGENT-ST-01", "Sentinel",    "Behavioral watchman — anomaly detection via ML",
+         '["scan_logs","detect_anomaly","alert_arbiter","auto_lockdown"]', "ACTIVE", True, 15),
+        ("AGENT-AR-01", "Arbiter",     "Central decision brain — allow/deny via risk score",
+         '["evaluate_token","allow_request","deny_request","broadcast_decision"]', "ACTIVE", True, 20),
+        ("AGENT-DA-01", "Data Access", "Fetches sensitive DB data only with valid PQC token",
+         '["fetch_data","read_logs","list_users","query_stats"]', "ACTIVE", True, 20),
+        ("AGENT-CA-01", "Cloud API",   "Manages external AWS cloud calls via encrypted channel",
+         '["aws_s3_check","aws_ec2_check","aws_lambda_check","cloud_health"]', "ACTIVE", True, 25),
+        ("AGENT-AD-01", "Adversary",   "Attack simulator — tests system resilience (Red Team)",
+         '["brute_force","token_hijack","api_flooding","privilege_escalation"]', "ACTIVE", True, 30),
+    ]
+    for agent_id, role, desc, caps, status, auto, interval in agents:
+        Database.execute("""
+            INSERT INTO agent_registry
+                (agent_id, role, description, capabilities, status, autonomous, bg_interval_sec, pqc_enabled)
+            VALUES (%s, %s, %s, %s::jsonb, %s, %s, %s, TRUE)
+            ON CONFLICT (agent_id) DO NOTHING
+        """, (agent_id, role, desc, caps, status, auto, interval))
 
 
 def _seed_default_users():
@@ -671,24 +714,42 @@ async def lifespan(app: FastAPI):
     # Sentinel: har 15 second mein automatically logs scan kare
     sentinel = get_sentinel()
     sentinel.start_background(interval=15)
-
+ 
     # Adversary: har 30 second mein automatically attack simulate kare
     adversary = get_adversary()
     adversary.start_background(interval=30)
-
-    # Sentinel ↔ Adversary direct link — ek doosre se baat kar sakein
+ 
+    # ── NEW: Data-Access Agent autonomous ──────────────
+    da_agent = get_da()
+    da_agent.start_background(interval=20)   
+ 
+    # ── NEW: Cloud-API Agent autonomous ────────────────
+    ca_agent = get_ca()
+    ca_agent.start_background(interval=25)   
+ 
+    # ── NEW: Arbiter autonomous monitoring ──────────────
+    arbiter = get_arbiter()
+    arbiter.start_background(interval=20)    
+ 
+    # Sentinel ↔ Adversary direct link
     sentinel.set_adversary_ref(adversary)
-
-    print("✅ Background threads started (Sentinel: 15s | Adversary: 30s)")
+ 
+    print("✅ Background threads started:")
+    print("   Sentinel:  15s | Adversary: 30s")
+    print("   DataAccess: 20s | CloudAPI: 25s | Arbiter: 20s")
+    print("✅ ALL 5 AGENTS AUTONOMOUS — khud kaam kar rahe hain")
     print("✅ Sentinel ↔ Adversary direct communication linked")
     print("✅ MessageBus initialized — Agent messaging ready")
-
+ 
     yield
-
+ 
     # ── Cleanup on shutdown ─────────────────────────────
     sentinel.stop_background()
     adversary.stop_background()
-    print("🛑 Background threads stopped")
+    da_agent.stop_background()
+    ca_agent.stop_background()
+    arbiter.stop_background()
+    print("🛑 All 5 background threads stopped")
 
 app = FastAPI(
     title=" Quantum Resilient Security Framework",
@@ -1136,7 +1197,66 @@ async def health():
         "pqc":        "active",
         "timestamp":  str(datetime.utcnow())
     }
-
+@app.get("/security/health-score")
+async def security_health_score(user: User = Depends(get_active_user)):
+    """
+    Security Health Score — 0 to 100
+    Dashboard mein bada number dikhata hai.
+    Automatic calculate hota hai based on: blocked attacks, agents status, PQC, ML
+    """
+    sentinel_status  = get_sentinel().get_status()
+    arbiter_status   = get_arbiter().get_status()
+    da_status        = get_da().get_status()
+    ca_status        = get_ca().get_status()
+    adversary_status = get_adversary().get_status()
+ 
+    # Active agents kitne hain (5 mein se)
+    all_statuses = [sentinel_status, arbiter_status, da_status, ca_status, adversary_status]
+    active_count = sum(1 for s in all_statuses if s.get("status") == "ACTIVE")
+    agents_score = (active_count / 5) * 30   # max 30 points
+ 
+    # Autonomous agents score
+    autonomous_count = sum(1 for s in all_statuses if s.get("bg_running") or s.get("autonomous"))
+    autonomous_score = (autonomous_count / 5) * 20  # max 20 points
+ 
+    # PQC active hai
+    pqc_score = 20  # PQC always active now
+ 
+    # ML model loaded hai
+    ml_score  = 15 if MLModel._loaded else 5
+ 
+    # DB connected
+    db_score  = 15 if Database.get_pool() is not None else 5
+ 
+    total_score = int(agents_score + autonomous_score + pqc_score + ml_score + db_score)
+    total_score = min(total_score, 100)  # 100 se zyada nahi
+ 
+    if total_score >= 85:
+        grade = "EXCELLENT"
+        color = "#00ff88"
+    elif total_score >= 65:
+        grade = "GOOD"
+        color = "#f59e0b"
+    else:
+        grade = "AT RISK"
+        color = "#ef4444"
+ 
+    return {
+        "score":            total_score,
+        "grade":            grade,
+        "color":            color,
+        "breakdown": {
+            "agents_online":   int(agents_score),
+            "autonomous":      int(autonomous_score),
+            "pqc_active":      pqc_score,
+            "ml_model":        ml_score,
+            "database":        db_score,
+        },
+        "active_agents":    active_count,
+        "autonomous_agents": autonomous_count,
+        "timestamp":        str(datetime.utcnow())
+    }
+ 
 
 # ═══════════════════════════════════════════════════════════
 #  QUANTUM ROUTES  —  /quantum/token   /quantum/compare
@@ -1446,6 +1566,178 @@ async def get_message_stats(user: User = Depends(get_active_user)):
 
 
 # ═══════════════════════════════════════════════════════════
+#  AGENT REGISTRY — Full CRUD
+# ═══════════════════════════════════════════════════════════
+
+class AgentRegistryEntry(BaseModel):
+    agent_id:        str
+    role:            str
+    description:     str  = ""
+    capabilities:    list = []
+    status:          str  = "ACTIVE"
+    autonomous:      bool = True
+    bg_interval_sec: int  = 15
+    pqc_enabled:     bool = True
+
+class AgentStatusUpdate(BaseModel):
+    status:          str
+    threat_level:    str  = "LOW"
+    failed_attempts: int  = 0
+
+def _sync_registry_from_live():
+    """
+    Live agent singletons se registry sync karo —
+    bg_running, failed_attempts, last_seen update karo.
+    """
+    live_map = {
+        "AGENT-ST-01": _sentinel,
+        "AGENT-AR-01": _arbiter,
+        "AGENT-DA-01": _da_agent,
+        "AGENT-CA-01": _ca_agent,
+        "AGENT-AD-01": _adversary,
+    }
+    for agent_id, agent_obj in live_map.items():
+        if agent_obj is None:
+            continue
+        status  = "BLOCKED" if agent_obj.is_blocked else ("ACTIVE" if agent_obj._running else "IDLE")
+        Database.execute("""
+            UPDATE agent_registry
+               SET status          = %s,
+                   autonomous      = %s,
+                   last_seen       = CURRENT_TIMESTAMP,
+                   metadata        = %s::jsonb
+             WHERE agent_id = %s
+        """, (
+            status,
+            agent_obj._running,
+            json.dumps({"bg_running": agent_obj._running, "interval": agent_obj._interval}),
+            agent_id,
+        ))
+
+@app.get("/registry/agents")
+async def registry_list(user: User = Depends(get_active_user)):
+    """Poori agent_registry — live status sync ke saath."""
+    _sync_registry_from_live()
+    rows = Database.execute("""
+        SELECT agent_id, role, description, capabilities, status,
+               autonomous, bg_interval_sec, pqc_enabled,
+               threat_level, failed_attempts, last_seen, registered_at, metadata
+          FROM agent_registry
+         ORDER BY registered_at
+    """, fetch=True)
+    if rows:
+        return {"agents": [
+            {
+                "agent_id":        r[0],
+                "role":            r[1],
+                "description":     r[2],
+                "capabilities":    r[3] if r[3] else [],
+                "status":          r[4],
+                "autonomous":      r[5],
+                "bg_interval_sec": r[6],
+                "pqc_enabled":     r[7],
+                "threat_level":    r[8],
+                "failed_attempts": r[9],
+                "last_seen":       str(r[10]) if r[10] else None,
+                "registered_at":   str(r[11]) if r[11] else None,
+                "metadata":        r[12] if r[12] else {},
+            }
+            for r in rows
+        ]}
+    return {"agents": [], "note": "No agents in registry — DB may be offline"}
+
+@app.get("/registry/agents/{agent_id}")
+async def registry_get(agent_id: str, user: User = Depends(get_active_user)):
+    """Ek agent ki full detail."""
+    _sync_registry_from_live()
+    rows = Database.execute("""
+        SELECT agent_id, role, description, capabilities, status,
+               autonomous, bg_interval_sec, pqc_enabled,
+               threat_level, failed_attempts, last_seen, registered_at, metadata
+          FROM agent_registry WHERE agent_id = %s
+    """, (agent_id,), fetch=True)
+    if not rows:
+        raise HTTPException(status_code=404, detail=f"Agent {agent_id} not found in registry")
+    r = rows[0]
+    return {
+        "agent_id": r[0], "role": r[1], "description": r[2],
+        "capabilities": r[3] or [], "status": r[4],
+        "autonomous": r[5], "bg_interval_sec": r[6], "pqc_enabled": r[7],
+        "threat_level": r[8], "failed_attempts": r[9],
+        "last_seen": str(r[10]) if r[10] else None,
+        "registered_at": str(r[11]) if r[11] else None,
+        "metadata": r[12] or {},
+    }
+
+@app.post("/registry/agents")
+async def registry_register(entry: AgentRegistryEntry,
+                             user: User = Depends(require_permission("admin:all"))):
+    """Naya agent register karo."""
+    Database.execute("""
+        INSERT INTO agent_registry
+            (agent_id, role, description, capabilities, status, autonomous, bg_interval_sec, pqc_enabled)
+        VALUES (%s, %s, %s, %s::jsonb, %s, %s, %s, %s)
+        ON CONFLICT (agent_id) DO UPDATE
+            SET role = EXCLUDED.role, description = EXCLUDED.description,
+                capabilities = EXCLUDED.capabilities, status = EXCLUDED.status,
+                autonomous = EXCLUDED.autonomous, bg_interval_sec = EXCLUDED.bg_interval_sec,
+                pqc_enabled = EXCLUDED.pqc_enabled
+    """, (
+        entry.agent_id, entry.role, entry.description,
+        json.dumps(entry.capabilities), entry.status,
+        entry.autonomous, entry.bg_interval_sec, entry.pqc_enabled,
+    ))
+    db_log(user.username, f"Agent registered: {entry.agent_id}", "INFO", user.role)
+    push_sse_event("INFO", {"event": "AGENT_REGISTERED", "agent_id": entry.agent_id,
+                            "role": entry.role, "message": f"New agent registered: {entry.agent_id}"})
+    return {"status": "registered", "agent_id": entry.agent_id}
+
+@app.patch("/registry/agents/{agent_id}/status")
+async def registry_update_status(agent_id: str, update: AgentStatusUpdate,
+                                  user: User = Depends(require_permission("admin:all"))):
+    """Agent ka status update karo (ACTIVE / BLOCKED / IDLE)."""
+    Database.execute("""
+        UPDATE agent_registry
+           SET status = %s, threat_level = %s, failed_attempts = %s, last_seen = CURRENT_TIMESTAMP
+         WHERE agent_id = %s
+    """, (update.status, update.threat_level, update.failed_attempts, agent_id))
+    db_log(user.username, f"Registry status update: {agent_id} → {update.status}", "INFO", user.role)
+    push_sse_event("INFO", {"event": "REGISTRY_STATUS_CHANGED", "agent_id": agent_id,
+                            "status": update.status, "message": f"{agent_id} status: {update.status}"})
+    return {"status": "updated", "agent_id": agent_id, "new_status": update.status}
+
+@app.delete("/registry/agents/{agent_id}")
+async def registry_deregister(agent_id: str,
+                               user: User = Depends(require_permission("admin:all"))):
+    """Agent ko registry se hata do."""
+    Database.execute("DELETE FROM agent_registry WHERE agent_id = %s", (agent_id,))
+    db_log(user.username, f"Agent deregistered: {agent_id}", "INFO", user.role)
+    push_sse_event("INFO", {"event": "AGENT_DEREGISTERED", "agent_id": agent_id,
+                            "message": f"Agent removed from registry: {agent_id}"})
+    return {"status": "deregistered", "agent_id": agent_id}
+
+@app.get("/registry/stats")
+async def registry_stats(user: User = Depends(get_active_user)):
+    """Registry summary stats."""
+    _sync_registry_from_live()
+    rows = Database.execute("""
+        SELECT
+            COUNT(*)                                         AS total,
+            COUNT(*) FILTER (WHERE status = 'ACTIVE')       AS active,
+            COUNT(*) FILTER (WHERE status = 'BLOCKED')      AS blocked,
+            COUNT(*) FILTER (WHERE autonomous = TRUE)       AS autonomous,
+            COUNT(*) FILTER (WHERE pqc_enabled = TRUE)      AS pqc_enabled,
+            SUM(failed_attempts)                            AS total_failures
+        FROM agent_registry
+    """, fetch=True)
+    if rows and rows[0][0]:
+        r = rows[0]
+        return {"total": r[0], "active": r[1], "blocked": r[2],
+                "autonomous": r[3], "pqc_enabled": r[4], "total_failures": int(r[5] or 0)}
+    return {"total": 0, "active": 0, "blocked": 0, "autonomous": 0, "pqc_enabled": 0, "total_failures": 0}
+
+
+# ═══════════════════════════════════════════════════════════
 #  SENTINEL DIRECT BLOCK ROUTE
 # ═══════════════════════════════════════════════════════════
 
@@ -1469,15 +1761,39 @@ async def sentinel_block_adversary(req: SentinelBlockRequest,
 @app.get("/agents/all")
 async def all_agents_status(user: User = Depends(get_active_user)):
     """
-    Sab agents ka status ek saath
+    Sab agents ka status ek saath — connectivity map ke liye
     Frontend: getAllAgentsStatus()
     """
+    sentinel_s  = get_sentinel().get_status()
+    arbiter_s   = get_arbiter().get_status()
+    da_s        = get_da().get_status()
+    ca_s        = get_ca().get_status()
+    adversary_s = get_adversary().get_status()
+ 
+    # Connections map — kaun kisse baat kar sakta hai
+    connections = [
+        {"from": "AGENT-DA-01",  "to": "AGENT-AR-01",  "type": "requests"},
+        {"from": "AGENT-CA-01",  "to": "AGENT-AR-01",  "type": "requests"},
+        {"from": "AGENT-AR-01",  "to": "AGENT-ST-01",  "type": "reports"},
+        {"from": "AGENT-ST-01",  "to": "AGENT-AD-01",  "type": "monitors"},
+        {"from": "AGENT-ST-01",  "to": "AGENT-AR-01",  "type": "alerts"},
+    ]
+ 
     return {
-        "AGENT-ST-01": get_sentinel().get_status(),
-        "AGENT-AR-01": get_arbiter().get_status(),
-        "AGENT-DA-01": get_da().get_status(),
-        "AGENT-CA-01": get_ca().get_status(),
-        "AGENT-AD-01": get_adversary().get_status(),
+        "agents": {
+            "AGENT-ST-01": sentinel_s,
+            "AGENT-AR-01": arbiter_s,
+            "AGENT-DA-01": da_s,
+            "AGENT-CA-01": ca_s,
+            "AGENT-AD-01": adversary_s,
+        },
+        "connections":   connections,
+        "total_agents":  5,
+        "active_agents": sum(1 for s in [sentinel_s, arbiter_s, da_s, ca_s, adversary_s]
+                             if s.get("status") == "ACTIVE"),
+        "autonomous_agents": sum(1 for s in [sentinel_s, arbiter_s, da_s, ca_s, adversary_s]
+                                 if s.get("bg_running") or s.get("autonomous")),
+        "timestamp": str(datetime.utcnow())
     }
 
 

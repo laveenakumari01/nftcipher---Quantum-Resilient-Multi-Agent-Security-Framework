@@ -9,12 +9,6 @@ load_dotenv()
 
 # ── LLM (OpenRouter) ──────────────────────────────────────
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
-
-# Primary model — OpenRouter pe available free models (2025-2026)
-# Agar yeh 404 de toh FALLBACK_MODELS try hote hain (base_agent.py mein)
-# openrouter/free = Official OpenRouter free-model auto-router (launched Feb 2026)
-# Automatically picks the best available free model for each request
-# Docs: https://openrouter.ai/openrouter/free
 LLM_MODEL = os.getenv("LLM_MODEL", "openrouter/free")
 
 # ── Backend ───────────────────────────────────────────────

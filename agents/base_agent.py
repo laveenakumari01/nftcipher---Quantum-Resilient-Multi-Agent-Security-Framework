@@ -241,11 +241,12 @@ class BaseAgent:
         import re
 
         models_to_try = [
-            LLM_MODEL,
-            "deepseek/deepseek-r1:free",
-            "deepseek/deepseek-v3:free",
-            "qwen/qwen3-14b:free",
-            "meta-llama/llama-4-scout:free",
+            LLM_MODEL,                                      # openrouter/free (primary)
+            "meta-llama/llama-3.3-70b-instruct:free",       # Meta — most stable free model
+            "openai/gpt-oss-20b:free",                      # OpenAI — lightweight
+            "openai/gpt-oss-120b:free",                     # OpenAI — powerful
+            "nvidia/nemotron-3-nano-30b-a3b:free",          # NVIDIA — tools support
+            "google/gemma-4-31b-it:free",                   # Google — vision + tools
         ]
         seen = set()
         models_to_try = [m for m in models_to_try if not (m in seen or seen.add(m))]
