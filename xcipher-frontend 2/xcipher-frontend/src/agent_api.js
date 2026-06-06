@@ -1,31 +1,36 @@
 /**
  * ============================================================
- *  agentApi.js —  Frontend API Layer
+ *  agent_api.js —  Frontend API Layer  (UPDATED)
  * ============================================================
  *
- *  PROJECT AGENTS:
- *  ┌─────────────────┬──────────────┬───────────────────────────────────────┐
- *  │ Agent ID        │ Role         │ Key Methods                           │
- *  ├─────────────────┼──────────────┼───────────────────────────────────────┤
- *  │ AGENT-ST-01     │ Sentinel     │ analyzeBehavior, getThreatReport      │
- *  │ AGENT-AR-01     │ Arbiter      │ arbitrate, blockAgent, getRiskScore   │
- *  │ AGENT-DA-01     │ Data Access  │ fetchData (users/logs/permissions)    │
- *  │ AGENT-CA-01     │ Cloud API    │ callService (aws_s3/ec2/lambda)       │
- *  │ AGENT-AD-01     │ Adversary    │ simulateAttack (5 attack types)       │
- *  └─────────────────┴──────────────┴───────────────────────────────────────┘
+ *  ALL 10 AGENTS:
+ *  ┌──────────────────────┬──────────────────┬───────────────────────────────────────┐
+ *  │ Agent ID             │ Role             │ Key Methods                           │
+ *  ├──────────────────────┼──────────────────┼───────────────────────────────────────┤
+ *  │ AGENT-ST-01          │ Sentinel         │ analyzeBehavior, getThreatReport      │
+ *  │ AGENT-AR-01          │ Arbiter          │ arbitrate, blockAgent                 │
+ *  │ AGENT-DA-01          │ Data Access      │ fetchData                             │
+ *  │ AGENT-CA-01          │ Cloud API        │ callCloudService                      │
+ *  │ AGENT-AD-01          │ Adversary        │ simulateAttack (5 types)              │
+ *  │ AGENT-CR-01          │ Cryptographer    │ getCryptographerStatus, issueKeys     │
+ *  │ AGENT-RS-01          │ Research         │ getResearchStatus, searchCVE          │
+ *  │ AGENT-CD-01          │ Coding           │ getCodingStatus, generateFirewallRule │
+ *  │ AGENT-VS-01          │ Vision           │ getVisionStatus, getVisionThreats     │
+ *  │ AGENT-TD-01          │ Threat Detection │ getThreatDetectionStatus              │
+ *  └──────────────────────┴──────────────────┴───────────────────────────────────────┘
  *
  */
 
 // ──────────────────────────────────────────────
-//  CONFIG — Yahan se sab kuch control hota hai
+//  CONFIG
 // ──────────────────────────────────────────────
-const MOCK_MODE     = false;
-const BACKEND_URL   = "http://localhost:8000";
-const REQUEST_TIMEOUT = 15000;  // 15 seconds
+const MOCK_MODE       = false;
+const BACKEND_URL     = "http://localhost:8000";
+const REQUEST_TIMEOUT = 15000; // 15 seconds
 
 
 // ──────────────────────────────────────────────
-//  TOKEN HELPER — get JWT from localStorage 
+//  TOKEN HELPER
 // ──────────────────────────────────────────────
 function _getAuthHeaders() {
   const token = localStorage.getItem("access_token") || "";
@@ -75,6 +80,34 @@ const MOCK_AGENTS_STATE = {
   "AGENT-AD-01": { agent_id: "AGENT-AD-01", role: "Adversary",    status: "ACTIVE", total_attacks_simulated: 0 },
 };
 
+// Mock data for new 5 agents
+const MOCK_NEW_AGENTS = {
+  cryptographer: {
+    agent_id: "AGENT-CR-01", role: "Cryptographer", status: "ACTIVE",
+    pqc_mode: "KYBER-768", keys_issued: 142, tokens_active: 38,
+    rotation_timer: "14m 22s", algorithm: "CRYSTALS-Kyber-768 + Dilithium3",
+  },
+  research: {
+    agent_id: "AGENT-RS-01", role: "Research", status: "ACTIVE",
+    cve_db_size: 2847, last_query: "SQL injection bypass",
+    rag_status: "ONLINE", vector_db: "ChromaDB",
+  },
+  coding: {
+    agent_id: "AGENT-CD-01", role: "Coding", status: "ACTIVE",
+    scripts_generated: 23, last_rule: "BLOCK ip 192.168.1.45",
+    safety_checks_passed: 23, safety_checks_failed: 0,
+  },
+  vision: {
+    agent_id: "AGENT-VS-01", role: "Vision", status: "ACTIVE",
+    mode: "SIMULATED", locations: 4, detections: 2,
+    active_threats: [],
+  },
+  threat_detection: {
+    agent_id: "AGENT-TD-01", role: "ThreatDetection", status: "ACTIVE",
+    phishing_checks: 891, malware_scans: 412, network_anomalies: 7,
+  },
+};
+
 let _runtimeState = {
   sentinelThreats:      [],
   monitoredAgents:      {},
@@ -116,7 +149,7 @@ function _generateMockToken(agentId) {
   return Math.abs(hash).toString(16).padStart(10, "0") + Date.now().toString(16);
 }
 
-// ── MAIN FETCH HELPER — Authorization header included ──
+// Main fetch helper — Authorization header included
 async function _apiFetch(endpoint, options = {}) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
@@ -130,7 +163,6 @@ async function _apiFetch(endpoint, options = {}) {
       },
     });
     clearTimeout(timer);
-    // 401 = token expired — clear karo
     if (res.status === 401) {
       localStorage.removeItem("access_token");
       throw new Error("Session expired — please login again");
@@ -150,7 +182,7 @@ function _mockDelay(ms = 300) {
 
 
 // ══════════════════════════════════════════════
-//  1. QUANTUM TOKEN  (pqc_simulation.py)
+//  1. QUANTUM TOKEN  (/quantum/*)
 // ══════════════════════════════════════════════
 
 export async function generateQuantumToken(agentId) {
@@ -165,16 +197,21 @@ export async function generateQuantumToken(agentId) {
 }
 
 export async function getPQCComparison() {
-  if (MOCK_MODE) {
-    await _mockDelay();
-    return MOCK_PQC_COMPARISON;
-  }
+  if (MOCK_MODE) { await _mockDelay(); return MOCK_PQC_COMPARISON; }
   return _apiFetch("/quantum/compare");
+}
+
+/**
+ * NEW — Real PQC mode check (no auth required)
+ * Returns: { real_pqc: bool, mode: "real"|"simulation", algorithm: str }
+ */
+export async function getPQCRealStatus() {
+  return _apiFetch("/pqc/real-status");
 }
 
 
 // ══════════════════════════════════════════════
-//  2. SENTINEL AGENT  (sentinel_agent.py)
+//  2. SENTINEL AGENT  (/sentinel/*)
 // ══════════════════════════════════════════════
 
 export async function analyzeBehavior(token, agentId, action, metadata = {}) {
@@ -230,7 +267,7 @@ export async function getSentinelStatus() {
 
 
 // ══════════════════════════════════════════════
-//  3. ARBITER AGENT  (arbiter_agent.py)
+//  3. ARBITER AGENT  (/arbiter/*)
 // ══════════════════════════════════════════════
 
 export async function arbitrate(token, agentId, action) {
@@ -273,7 +310,7 @@ export async function getArbiterStatus() {
 
 
 // ══════════════════════════════════════════════
-//  4. DATA ACCESS AGENT  (data_access_agent.py)
+//  4. DATA ACCESS AGENT  (/data/*)
 // ══════════════════════════════════════════════
 
 export async function fetchData(token, table, query) {
@@ -298,7 +335,7 @@ export async function getDataAgentStatus() {
 
 
 // ══════════════════════════════════════════════
-//  5. CLOUD API AGENT  (cloud_api_agent.py)
+//  5. CLOUD API AGENT  (/cloud/*)
 // ══════════════════════════════════════════════
 
 export async function callCloudService(token, service, action) {
@@ -322,7 +359,7 @@ export async function getCloudAgentStatus() {
 
 
 // ══════════════════════════════════════════════
-//  6. ADVERSARY AGENT  (adversary_agent.py)
+//  6. ADVERSARY AGENT  (/adversary/*)
 // ══════════════════════════════════════════════
 
 export async function simulateTokenHijacking(stolenToken, target) {
@@ -409,9 +446,32 @@ export async function getAdversaryStatus() {
 //  7. ALL AGENTS + MEMORY
 // ══════════════════════════════════════════════
 
+/**
+ * Original 5 agents ka status — /agents/all
+ */
 export async function getAllAgentsStatus() {
   if (MOCK_MODE) { await _mockDelay(); return MOCK_AGENTS_STATE; }
   return _apiFetch("/agents/all");
+}
+
+/**
+ * NEW — Saare 10 agents ka full status ek call mein
+ * Returns: { sentinel, arbiter, data_access, cloud_api, adversary,
+ *            cryptographer, research, coding, vision, threat_detection, orchestrator }
+ */
+export async function getAllAgentsFullStatus() {
+  if (MOCK_MODE) {
+    await _mockDelay();
+    return {
+      sentinel:         MOCK_AGENTS_STATE["AGENT-ST-01"],
+      arbiter:          MOCK_AGENTS_STATE["AGENT-AR-01"],
+      data_access:      MOCK_AGENTS_STATE["AGENT-DA-01"],
+      cloud_api:        MOCK_AGENTS_STATE["AGENT-CA-01"],
+      adversary:        MOCK_AGENTS_STATE["AGENT-AD-01"],
+      ...MOCK_NEW_AGENTS,
+    };
+  }
+  return _apiFetch("/agents/all-status");
 }
 
 export async function getAgentStatus(agentId) {
@@ -427,4 +487,458 @@ export async function getAgentMemory(agentId) {
 export async function getLogs(limit = 50) {
   if (MOCK_MODE) { await _mockDelay(); return []; }
   return _apiFetch(`/logs?limit=${limit}`);
+}
+
+
+// ══════════════════════════════════════════════
+//  8. CRYPTOGRAPHER AGENT  (/cryptographer/*)   [NEW]
+// ══════════════════════════════════════════════
+
+/**
+ * Cryptographer Agent ka status — PQC mode, keys issued, tokens active
+ * Returns: { agent_id, pqc_mode, keys_issued, tokens_active, rotation_timer, status }
+ */
+export async function getCryptographerStatus() {
+  if (MOCK_MODE) { await _mockDelay(); return MOCK_NEW_AGENTS.cryptographer; }
+  return _apiFetch("/cryptographer/status");
+}
+
+/**
+ * Kisi agent ke liye naya Kyber768 + Dilithium3 keypair generate karo
+ * Requires: admin role
+ * Returns: { agent_id, public_key, algorithm, issued_at }
+ */
+export async function issueKeys(agentId) {
+  if (MOCK_MODE) {
+    await _mockDelay(500);
+    return { agent_id: agentId, public_key: "mock_pk_" + agentId, algorithm: "KYBER-768", issued_at: Date.now() };
+  }
+  return _apiFetch(`/cryptographer/issue-keys/${agentId}`, { method: "POST" });
+}
+
+/**
+ * Agent ke liye PQC-signed token issue karo
+ * Requires: admin role
+ * Returns: { agent_id, token, algorithm, expires_at }
+ */
+export async function issueToken(agentId) {
+  if (MOCK_MODE) {
+    await _mockDelay(500);
+    return { agent_id: agentId, token: _generateMockToken(agentId), algorithm: "CRYSTALS-Kyber + Dilithium", expires_at: Date.now() + 3600000 };
+  }
+  return _apiFetch(`/cryptographer/issue-token/${agentId}`, { method: "POST" });
+}
+
+/**
+ * Token verify karo — valid hai ya nahi
+ * Returns: { valid: bool, agent_id, reason }
+ */
+export async function verifyToken(token) {
+  if (MOCK_MODE) {
+    await _mockDelay(300);
+    return { valid: _validateToken(token), agent_id: "unknown", reason: token ? "Token valid" : "Token missing" };
+  }
+  return _apiFetch("/cryptographer/verify-token", {
+    method: "POST",
+    body: JSON.stringify({ token }),
+  });
+}
+
+/**
+ * Message sign karo
+ * Returns: { signed_message, signature, algorithm }
+ */
+export async function signMessage(message, agentId) {
+  if (MOCK_MODE) {
+    await _mockDelay(300);
+    return { signed_message: message, signature: "mock_sig_" + Date.now(), algorithm: "Dilithium3", agent_id: agentId };
+  }
+  return _apiFetch("/cryptographer/sign-message", {
+    method: "POST",
+    body: JSON.stringify({ message, agent_id: agentId }),
+  });
+}
+
+
+// ══════════════════════════════════════════════
+//  9. RESEARCH AGENT  (/research/*)   [NEW]
+// ══════════════════════════════════════════════
+
+/**
+ * Research Agent ka status — VectorDB size, RAG mode, last query
+ * Returns: { agent_id, cve_db_size, last_query, rag_status, vector_db, status }
+ */
+export async function getResearchStatus() {
+  if (MOCK_MODE) { await _mockDelay(); return MOCK_NEW_AGENTS.research; }
+  return _apiFetch("/research/status");
+}
+
+/**
+ * RAG-powered CVE/threat search — VectorDB se retrieve + LLM context
+ * @param {string} query - threat ya vulnerability description
+ * @param {number} topK  - kitne results chahiye (default 3)
+ * Returns: { results: [...], query, source: "RAG+LLM" }
+ */
+export async function searchCVE(query, topK = 3) {
+  if (MOCK_MODE) {
+    await _mockDelay(800);
+    return {
+      query,
+      results: [
+        { cve_id: "CVE-2024-1234", score: 0.92, summary: "Mock CVE related to: " + query },
+        { cve_id: "CVE-2024-5678", score: 0.85, summary: "Another related vulnerability" },
+      ],
+      source: "MOCK_RAG",
+    };
+  }
+  return _apiFetch("/research/search", {
+    method: "POST",
+    body: JSON.stringify({ query, top_k: topK }),
+  });
+}
+
+/**
+ * Research Agent ki search history
+ * Returns: { history: [...], count }
+ */
+export async function getResearchHistory() {
+  if (MOCK_MODE) {
+    await _mockDelay();
+    return { history: [{ query: "SQL injection", timestamp: Date.now() - 60000 }], count: 1 };
+  }
+  return _apiFetch("/research/history");
+}
+
+/**
+ * VectorDB mein naya threat intel add karo
+ * @param {string} content - CVE ya threat description
+ * @param {object} metadata - { cve_id, severity, source }
+ */
+export async function addThreatIntel(content, metadata = {}) {
+  if (MOCK_MODE) {
+    await _mockDelay(400);
+    return { status: "added", id: "mock_" + Date.now() };
+  }
+  return _apiFetch("/research/add-intel", {
+    method: "POST",
+    body: JSON.stringify({ content, metadata }),
+  });
+}
+
+
+// ══════════════════════════════════════════════
+//  10. CODING AGENT  (/coding/*)   [NEW]
+// ══════════════════════════════════════════════
+
+/**
+ * Coding Agent ka status — scripts generated, last rule, safety checks
+ * Returns: { agent_id, scripts_generated, last_rule, safety_checks_passed, status }
+ */
+export async function getCodingStatus() {
+  if (MOCK_MODE) { await _mockDelay(); return MOCK_NEW_AGENTS.coding; }
+  return _apiFetch("/coding/status");
+}
+
+/**
+ * Fetch all auto-generated firewall rules from CodingAgent.
+ * Returns: { firewall_rules: [...], total_rules, total_scripts, safe_checked, auto_seeded }
+ *
+ * Note: The backend auto-seeds baseline rules on first call if _generated_scripts
+ * is empty (e.g. after a restart). Run a threat simulation to generate live rules.
+ */
+export async function getFirewallRules() {
+  if (MOCK_MODE) {
+    await _mockDelay(400);
+    return {
+      firewall_rules: [
+        {
+          rule_id: "mock001abc",
+          type: "firewall_rule",
+          rule: "iptables -I INPUT -s 192.168.1.100 -j DROP -m comment --comment 'NFTCipher-BRUTE_FORCE'",
+          revert: "iptables -D INPUT -s 192.168.1.100 -j DROP",
+          explanation: "Block all traffic from 192.168.1.100 detected as BRUTE_FORCE",
+          threat: { ip: "192.168.1.100", attack_type: "BRUTE_FORCE", score: 0.87 },
+          generated_at: Date.now() / 1000 - 120,
+          applied: true,
+          safe_checked: true,
+        },
+      ],
+      total_rules: 1,
+      total_scripts: 3,
+      safe_checked: 1,
+    };
+  }
+  return _apiFetch("/coding/rules");
+}
+
+/**
+ * Generate an iptables firewall rule for a given threat.
+ * @param {object} data - { ip, attack_type, port (optional), score (optional) }
+ * Note: Agent only generates — does not apply. Arbiter decides application.
+ * Returns: { rule, ip, attack_type, generated_at }
+ */
+export async function generateFirewallRule(data) {
+  if (MOCK_MODE) {
+    await _mockDelay(600);
+    return {
+      rule: `iptables -A INPUT -s ${data.ip || "0.0.0.0"} -j DROP`,
+      ip: data.ip,
+      attack_type: data.attack_type,
+      generated_at: Date.now(),
+      source: "MOCK_CODING_AGENT",
+    };
+  }
+  return _apiFetch("/coding/firewall-rule", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+/**
+ * Incident response script generate karo
+ * @param {object} data - { incident_type, severity, affected_system }
+ */
+export async function generateIncidentResponse(data) {
+  if (MOCK_MODE) {
+    await _mockDelay(600);
+    return { script: "# Mock incident response script", steps: ["Isolate system", "Collect logs", "Notify team"], source: "MOCK" };
+  }
+  return _apiFetch("/coding/incident-response", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+
+// ══════════════════════════════════════════════
+//  11. VISION AGENT  (/vision/*)   [NEW]
+// ══════════════════════════════════════════════
+
+/**
+ * Vision Agent ka status — mode, locations monitored, total detections
+ * Returns: { agent_id, mode: "real"|"simulated", locations, detections, status }
+ */
+export async function getVisionStatus() {
+  if (MOCK_MODE) { await _mockDelay(); return MOCK_NEW_AGENTS.vision; }
+  return _apiFetch("/vision/status");
+}
+
+/**
+ * Active physical threats from Vision Agent
+ * Returns: { active_threats: [...], total_detections }
+ * Threat format: { type, location, severity, detected_at }
+ */
+export async function getVisionThreats() {
+  if (MOCK_MODE) {
+    await _mockDelay();
+    return {
+      active_threats: [
+        { type: "tailgating", location: "Main Entrance", severity: "HIGH", detected_at: Date.now() - 120000 },
+        { type: "after_hours_access", location: "Server Room", severity: "MEDIUM", detected_at: Date.now() - 300000 },
+      ],
+      total_detections: 2,
+    };
+  }
+  return _apiFetch("/vision/active-threats");
+}
+
+/**
+ * Physical security event analyze karo
+ * @param {string} description - Camera scene ya event description
+ * @param {string} location    - Location name
+ */
+export async function analyzePhysicalEvent(description, location) {
+  if (MOCK_MODE) {
+    await _mockDelay(700);
+    return { threat_detected: false, threat_type: null, severity: "LOW", description, location, source: "MOCK_VISION" };
+  }
+  return _apiFetch("/vision/analyze", {
+    method: "POST",
+    body: JSON.stringify({ description, location }),
+  });
+}
+
+
+// ══════════════════════════════════════════════
+//  12. THREAT DETECTION AGENT  (/threat-detection/*)   [NEW]
+// ══════════════════════════════════════════════
+
+/**
+ * Threat Detection Agent ka status — phishing, malware, network anomaly counts
+ * Returns: { agent_id, phishing_checks, malware_scans, network_anomalies, status }
+ */
+export async function getThreatDetectionStatus() {
+  if (MOCK_MODE) { await _mockDelay(); return MOCK_NEW_AGENTS.threat_detection; }
+  return _apiFetch("/threat-detection/status");
+}
+
+/**
+ * URL phishing check — rule-based + regex + LLM analysis
+ * @param {string} url - Check karna wala URL
+ * Returns: { is_phishing: bool, confidence, reason, url }
+ */
+export async function checkPhishing(url) {
+  if (MOCK_MODE) {
+    await _mockDelay(500);
+    const suspicious = url.includes("login") || url.includes("verify") || url.includes("secure");
+    return { is_phishing: suspicious, confidence: suspicious ? 0.87 : 0.12, reason: suspicious ? "Suspicious keywords detected" : "No phishing indicators", url, source: "MOCK" };
+  }
+  return _apiFetch("/threat-detection/phishing", {
+    method: "POST",
+    body: JSON.stringify({ url }),
+  });
+}
+
+/**
+ * File/content malware scan
+ * @param {string} content - File content ya description
+ * Returns: { is_malware: bool, confidence, threat_type, content }
+ */
+export async function scanMalware(content) {
+  if (MOCK_MODE) {
+    await _mockDelay(500);
+    return { is_malware: false, confidence: 0.05, threat_type: null, content: content?.slice(0, 50), source: "MOCK" };
+  }
+  return _apiFetch("/threat-detection/malware", {
+    method: "POST",
+    body: JSON.stringify({ content }),
+  });
+}
+
+/**
+ * Network traffic anomaly check
+ * @param {object} data - { source_ip, dest_ip, port, bytes_transferred, protocol }
+ * Returns: { is_anomaly: bool, anomaly_type, confidence, data }
+ */
+export async function checkNetworkAnomaly(data) {
+  if (MOCK_MODE) {
+    await _mockDelay(500);
+    return { is_anomaly: false, anomaly_type: null, confidence: 0.08, data, source: "MOCK" };
+  }
+  return _apiFetch("/threat-detection/network", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+
+// ══════════════════════════════════════════════
+//  13. ORCHESTRATOR  (/orchestrator/*)   [NEW]
+// ══════════════════════════════════════════════
+
+/**
+ * LangGraph orchestrator ka status — graph compiled, cycle count, last verdict
+ * Returns: { graph_compiled: bool, total_cycles, last_verdict, cycle_history: [...] }
+ */
+export async function getOrchestratorStatus() {
+  if (MOCK_MODE) {
+    await _mockDelay();
+    return { graph_compiled: true, total_cycles: 47, last_verdict: "NO_THREAT", cycle_history: [], status: "ACTIVE" };
+  }
+  return _apiFetch("/orchestrator/status");
+}
+
+/**
+ * Manually ek full security cycle trigger karo
+ * Requires: admin role
+ * Cycle order: research → sentinel → threat_det → vision → verify → arbiter → cryptographer → coding → complete
+ * @param {string} trigger  - "manual" ya event type
+ * @param {object} payload  - Extra context (optional)
+ * Returns: { cycle_id, verdict, actions_taken, duration_ms }
+ */
+export async function runOrchestratorCycle(trigger = "manual", payload = {}) {
+  if (MOCK_MODE) {
+    await _mockDelay(1200);
+    return { cycle_id: "mock_cycle_" + Date.now(), verdict: "NO_THREAT", actions_taken: [], duration_ms: 1200, trigger };
+  }
+  return _apiFetch("/orchestrator/run-cycle", {
+    method: "POST",
+    body: JSON.stringify({ trigger, payload }),
+  });
+}
+
+
+// ══════════════════════════════════════════════
+//  14. SUGGESTION ENGINE  (/suggestions/*)   [NEW]
+// ══════════════════════════════════════════════
+
+/**
+ * AI-generated security suggestions — most recent first
+ * @param {number} limit - Kitni suggestions chahiye (default 50)
+ * Returns: { suggestions: [...], count, timestamp }
+ * Suggestion format: { threat_summary, root_cause, immediate_actions,
+ *                      longterm_fix, risk_assessment, cves: [...] }
+ */
+export async function getSuggestions(limit = 50) {
+  if (MOCK_MODE) {
+    await _mockDelay();
+    return {
+      suggestions: [
+        {
+          id: "mock_sug_1",
+          threat_summary: "SQL Injection attempt detected on /data/fetch",
+          root_cause: "Unparameterized query in Data Access Agent",
+          immediate_actions: ["Block IP 192.168.1.45", "Rotate DB credentials"],
+          longterm_fix: "Use parameterized queries, add input validation layer",
+          risk_assessment: "HIGH — data exfiltration possible",
+          cves: ["CVE-2024-1234"],
+          timestamp: Date.now() - 60000,
+        },
+      ],
+      count: 1,
+      timestamp: Date.now(),
+    };
+  }
+  return _apiFetch(`/suggestions?limit=${limit}`);
+}
+
+/**
+ * Ek specific suggestion — thread_id se
+ */
+export async function getSuggestionById(threadId) {
+  if (MOCK_MODE) { await _mockDelay(); return null; }
+  return _apiFetch(`/suggestions/${threadId}`);
+}
+
+/**
+ * Suggestion engine ka summary stats
+ * Returns: { total, high_risk, pending_actions, resolved }
+ */
+export async function getSuggestionStats() {
+  if (MOCK_MODE) {
+    await _mockDelay();
+    return { total: 1, high_risk: 1, pending_actions: 2, resolved: 0 };
+  }
+  return _apiFetch("/suggestions/stats/summary");
+}
+
+
+// ══════════════════════════════════════════════
+//  15. VERIFICATION ENGINE  (/security/*)   [NEW]
+// ══════════════════════════════════════════════
+
+/**
+ * Verification Engine ka stats — voter accuracy, false positive rate
+ * Returns: { confirmed_threats, false_positives, total_verified,
+ *            accuracy, consensus_method, action_thresholds }
+ */
+export async function getVerificationStats() {
+  if (MOCK_MODE) {
+    await _mockDelay();
+    return {
+      confirmed_threats: 48,
+      false_positives:   12,
+      total_verified:    60,
+      accuracy:          "80.0%",
+      verifier_active:   true,
+      consensus_method:  "2-of-3 vote (LLM 35% + ML 45% + Rules 20%)",
+      action_thresholds: {
+        AUTO_BLOCK: "score >= 0.80",
+        ALERT:      "score >= 0.50",
+        WATCHLIST:  "score >= 0.25",
+        IGNORE:     "score < 0.25",
+      },
+    };
+  }
+  return _apiFetch("/security/verification-stats");
 }

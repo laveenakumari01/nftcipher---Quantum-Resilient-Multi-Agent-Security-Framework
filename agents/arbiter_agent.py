@@ -9,6 +9,7 @@ import time
 import requests
 from agents.base_agent import BaseAgent
 from config.settings import MOCK_MODE, BACKEND_URL
+from verification.result_verifier import ResultVerifier, AgentClaim
 
 # Mock fallback — used if backend is unavailable
 MOCK_PERMISSIONS = {
@@ -48,6 +49,14 @@ class ArbiterAgent(BaseAgent):
         self.request_counts = {}
         self.request_times  = {}
 
+        # Verification engine — autonomous monitoring decisions go through this
+        # so Arbiter blocks are consensus-based, not just risk-score-based
+        self.verifier = ResultVerifier()
+
+        # Anomaly detector — used in autonomous monitoring cycle
+        from anomaly_detection.anomaly_detector import AnomalyDetector
+        self.anomaly_detector = AnomalyDetector()
+
         # These agents are monitored autonomously by the Arbiter
         self._monitor_agents = [
             "AGENT-DA-01",
@@ -61,81 +70,104 @@ class ArbiterAgent(BaseAgent):
     # ── AUTONOMOUS CYCLE ────────────────────────────────────
     def run_cycle(self):
         """
-        The background thread calls this every 20 seconds.
-
-        The Arbiter automatically reviews agents and asks the LLM
-        whether there is any suspicious activity.
+        Runs every 20 seconds.
+        Fix: Old code blocked agents based only on risk_score >= 0.9 and
+        LLM opinion — no consensus verification. Now every autonomous block
+        goes through ResultVerifier (4-layer: LLM + ML + Rules + Hash) before
+        any action is taken, same as Sentinel does.
         """
 
         # Check one agent per cycle (rotating)
         agent_to_check = self._monitor_agents[
             self._monitor_index % len(self._monitor_agents)
         ]
-
         self._monitor_index += 1
 
         # Skip if already blocked
         if agent_to_check in self.blocked_agents:
-
             self.broadcast("INFO", {
-                "event":      "ARBITER_SKIP",
-                "agent_id":   self.agent_id,
-                "target":     agent_to_check,
-                "reason":     "Already blocked",
-                "timestamp":  time.time()
+                "event":     "ARBITER_SKIP",
+                "agent_id":  self.agent_id,
+                "target":    agent_to_check,
+                "reason":    "Already blocked",
+                "timestamp": time.time(),
             })
-
             return
 
-        risk = self.calculate_risk_score(
-            agent_to_check,
-            "autonomous_health_check"
+        risk = self.calculate_risk_score(agent_to_check, "autonomous_health_check")
+        req_count = self.request_counts.get(agent_to_check, 0)
+
+        # --- Real ML score from AnomalyDetector (not just risk formula) ---
+        ml_result = self.anomaly_detector.detect(
+            agent_id   = agent_to_check,
+            agent_data = {
+                "request_count":   req_count,
+                "failed_attempts": 0,
+                "data_size":       0,
+                "unique_actions":  1,
+                "time_window":     60,
+                "repeated_action": False,
+                "unusual_hour":    False,
+            },
+        )
+        ml_risk = ml_result["risk_score"]
+
+        # Build flags from risk score + ML output
+        flags = []
+        if risk >= 0.5:
+            flags.append("HIGH_REQUEST_COUNT")
+        if ml_result["is_anomaly"]:
+            flags.append(f"ML_{ml_result['attack_type']}")
+
+        # --- Run through 4-layer verifier before any block decision ---
+        claim = AgentClaim(
+            agent_id     = agent_to_check,
+            claim_type   = "THREAT" if flags else "NORMAL",
+            confidence   = max(risk, ml_risk),
+            flags        = flags,
+            raw_evidence = {
+                "request_count":   req_count,
+                "rpm":             req_count / 1.0,
+                "failed_attempts": 0,
+                "data_mb":         0,
+            },
+            llm_reason = f"Arbiter autonomous check — risk={risk:.2f}",
         )
 
-        # Ask the LLM whether this agent is safe
-        decision = self.think(
-            task=(
-                f"Autonomous monitoring: Agent [{agent_to_check}] "
-                f"has risk score {risk:.2f}. "
-                f"Should I flag it or is it safe?"
-            ),
+        verified = self.verifier.verify(claim, self, ml_risk_score=ml_risk)
 
-            context={
-                "target_agent":   agent_to_check,
-                "risk_score":     risk,
-                "blocked_agents": self.blocked_agents,
-                "request_count":  self.request_counts.get(agent_to_check, 0),
-                "mode":           "autonomous_monitor"
-            }
-        )
-
-        # Send LLM reasoning and status to dashboard
+        # Broadcast full verification result to dashboard
         self.broadcast("INFO", {
-            "event":       "ARBITER_MONITOR",
-            "agent_id":    self.agent_id,
-            "target":      agent_to_check,
-            "risk_score":  round(risk, 2),
-            "llm_action":  decision.get("action", "unknown"),
-            "llm_reason":  decision.get("reason", ""),
-            "llm_safe":    decision.get("safe", True),
-            "timestamp":   time.time()
+            "event":           "ARBITER_MONITOR",
+            "agent_id":        self.agent_id,
+            "target":          agent_to_check,
+            "risk_score":      round(risk, 2),
+            "ml_risk":         round(ml_risk, 2),
+            "final_verdict":   verified.final_verdict,
+            "consensus_score": verified.consensus_score,
+            "action_level":    verified.action_level,
+            "vote_breakdown":  verified.vote_breakdown,
+            "integrity_hash":  verified.integrity_hash[:16],
+            "flags":           flags,
+            "timestamp":       time.time(),
         })
 
-        # If the LLM marks it unsafe → trigger auto-lockdown
-        if not decision.get("safe") or risk >= RISK_HIGH:
-
+        # Only block if verifier confirms — not just on raw risk score
+        if verified.action_level == "AUTO_BLOCK":
             self.block_agent(
                 agent_to_check,
-                f"Arbiter autonomous flag — LLM: {decision.get('reason')}"
+                f"Arbiter verified block — consensus={verified.consensus_score:.2f} "
+                f"flags={flags}",
             )
-
             self.broadcast("THREAT", {
-                "event":       "ARBITER_AUTO_LOCKDOWN",
-                "agent_id":    self.agent_id,
-                "target":      agent_to_check,
-                "risk_score":  round(risk, 2),
-                "llm_reason":  decision.get("reason"),
-                "timestamp":   time.time()
+                "event":           "ARBITER_AUTO_LOCKDOWN",
+                "agent_id":        self.agent_id,
+                "target":          agent_to_check,
+                "consensus_score": verified.consensus_score,
+                "vote_breakdown":  verified.vote_breakdown,
+                "flags":           flags,
+                "integrity_hash":  verified.integrity_hash[:16],
+                "timestamp":       time.time(),
             })
 
     # ── RISK SCORE ──────────────────────────────────────────
@@ -223,140 +255,146 @@ class ArbiterAgent(BaseAgent):
         Main function — ALLOW or DENY.
 
         Flow:
-        Token → Risk Score → Permission → ML → LLM → Decision
+        Token → Permission → Risk Score → ML → 4-Layer Verifier → Decision
+
+        Fix: Old Step 3 blocked agents directly when risk >= 0.9 without
+        running the verification engine. Now the final block/allow decision
+        always goes through ResultVerifier so Arbiter decisions are
+        consensus-verified (LLM + ML + Rules), not just risk-score-gated.
         """
 
         # Step 1 — Validate token
         if not self.authenticate(token):
-
             return {
                 "decision":   "DENY",
                 "reason":     "Invalid or expired token",
                 "risk_score": 1.0,
-                "agent_id":   agent_id
+                "agent_id":   agent_id,
+                "verified":   False,
             }
 
-        # Step 2 — Calculate risk score
-        risk_score = self.calculate_risk_score(agent_id, action)
-
-        # Step 3 — High risk → deny and trigger auto-lockdown
-        if risk_score >= RISK_HIGH:
-
-            self.block_agent(
-                agent_id,
-                f"Risk too high: {risk_score:.2f}"
-            )
-
-            self.log_action(f"BLOCKED_{agent_id}", False)
-
-            return {
-                "decision":   "DENY",
-                "reason": (
-                    f"Risk score too high: {risk_score:.2f} "
-                    f"— Auto-lockdown triggered"
-                ),
-                "risk_score": risk_score,
-                "agent_id":   agent_id
-            }
-
-        # Step 4 — Permission check
+        # Step 2 — Permission check (hard gate — no need to verify further)
         has_permission = self.check_permission(agent_id, action)
-
         if not has_permission:
-
             self.log_action(f"NO_PERMISSION_{agent_id}", False)
-
             return {
                 "decision":   "DENY",
-                "reason": (
-                    f"Agent [{agent_id}] has no permission "
-                    f"for [{action}]"
-                ),
-                "risk_score": risk_score,
-                "agent_id":   agent_id
+                "reason":     f"Agent [{agent_id}] has no permission for [{action}]",
+                "risk_score": 0.0,
+                "agent_id":   agent_id,
+                "verified":   False,
             }
 
-        # Step 5 — ML security check
-        ml_result = self.analyze_with_backend(
-            event=f"arbiter check {agent_id} {action}",
-            rpm=2.0,
-            failed=0.0,
-            data_mb=0.1,
-            endpoints=1.0,
-            login_time=1.0
+        # Step 3 — Risk score + ML anomaly detection
+        risk_score = self.calculate_risk_score(agent_id, action)
+        req_count  = self.request_counts.get(agent_id, 0)
+
+        ml_result = self.anomaly_detector.detect(
+            agent_id   = agent_id,
+            agent_data = {
+                "request_count":   req_count,
+                "failed_attempts": 0,
+                "data_size":       0,
+                "unique_actions":  1,
+                "time_window":     60,
+                "repeated_action": False,
+                "unusual_hour":    False,
+            },
         )
+        ml_risk = ml_result["risk_score"]
 
-        if ml_result.get("status") == "anomaly":
+        # Build flags
+        flags = []
+        if risk_score >= RISK_MEDIUM:
+            flags.append("HIGH_REQUEST_COUNT")
+        if ml_result["is_anomaly"]:
+            flags.append(f"ML_{ml_result['attack_type']}")
 
-            return {
-                "decision":   "DENY",
-                "reason": (
-                    f"ML anomaly detected — "
-                    f"{ml_result.get('risk_level')}"
-                ),
-                "risk_score": risk_score,
-                "agent_id":   agent_id
-            }
-
-        # Step 6 — Final LLM decision
-        decision = self.think(
-            task=(
-                f"Agent [{agent_id}] wants to [{action}]. "
-                f"Risk: {risk_score:.2f}. "
-                f"Permission: granted. Allow or Deny?"
+        # Step 4 — Run 4-layer verification (LLM + ML + Rules + Hash)
+        # This is the key fix: block only happens if verifier confirms,
+        # not just because risk_score crossed a threshold.
+        claim = AgentClaim(
+            agent_id     = agent_id,
+            claim_type   = "THREAT" if flags else "NORMAL",
+            confidence   = max(risk_score, ml_risk),
+            flags        = flags,
+            raw_evidence = {
+                "request_count":   req_count,
+                "rpm":             req_count / 1.0,
+                "failed_attempts": 0,
+                "data_mb":         0,
+            },
+            llm_reason = (
+                f"Arbiter arbitrate check — risk={risk_score:.2f} "
+                f"action={action}"
             ),
-
-            context={
-                "agent_id":       agent_id,
-                "action":         action,
-                "risk_score":     risk_score,
-                "has_permission": has_permission
-            }
         )
 
-        # Send LLM reasoning to dashboard
+        verified = self.verifier.verify(claim, self, ml_risk_score=ml_risk)
+
+        # Broadcast full verification result to dashboard
         self.broadcast("INFO", {
-            "event":       "ARBITER_DECISION",
-            "agent_id":    self.agent_id,
-            "target":      agent_id,
-            "action":      action,
-            "risk_score":  round(risk_score, 2),
-            "llm_action":  decision.get("action"),
-            "llm_reason":  decision.get("reason"),
-            "llm_safe":    decision.get("safe"),
-            "timestamp":   time.time()
+            "event":           "ARBITER_DECISION",
+            "agent_id":        self.agent_id,
+            "target":          agent_id,
+            "action":          action,
+            "risk_score":      round(risk_score, 2),
+            "ml_risk":         round(ml_risk, 2),
+            "final_verdict":   verified.final_verdict,
+            "consensus_score": verified.consensus_score,
+            "action_level":    verified.action_level,
+            "vote_breakdown":  verified.vote_breakdown,
+            "integrity_hash":  verified.integrity_hash[:16],
+            "flags":           flags,
+            "timestamp":       time.time(),
         })
 
-        if decision.get("safe") and decision.get("action") != "BLOCKED":
-
-            self.log_action(
-                f"ALLOWED_{agent_id}_{action}",
-                True
+        # Step 5 — Final decision based on verified result
+        if verified.action_level == "AUTO_BLOCK":
+            self.block_agent(
+                agent_id,
+                f"Arbiter verified block — consensus={verified.consensus_score:.2f} "
+                f"flags={flags}",
             )
-
+            self.log_action(f"BLOCKED_{agent_id}", False)
             return {
-                "decision":   "ALLOW",
-                "reason":     decision.get(
-                    "reason",
-                    "All checks passed"
+                "decision":        "DENY",
+                "reason":          (
+                    f"Verified threat — consensus={verified.consensus_score:.2f} "
+                    f"flags={flags}"
                 ),
-                "risk_score": risk_score,
-                "agent_id":   agent_id
+                "risk_score":      risk_score,
+                "agent_id":        agent_id,
+                "verified":        True,
+                "consensus_score": verified.consensus_score,
+                "integrity_hash":  verified.integrity_hash[:16],
             }
 
-        self.log_action(
-            f"DENIED_{agent_id}_{action}",
-            False
-        )
+        if verified.final_verdict in ("CONFIRMED_THREAT", "UNCERTAIN") and \
+           verified.action_level == "ALERT":
+            # Threat flagged but not severe enough for auto-block
+            self.log_action(f"ALERT_{agent_id}_{action}", False)
+            return {
+                "decision":        "DENY",
+                "reason":          (
+                    f"Alert-level threat — consensus={verified.consensus_score:.2f}"
+                ),
+                "risk_score":      risk_score,
+                "agent_id":        agent_id,
+                "verified":        True,
+                "consensus_score": verified.consensus_score,
+            }
 
+        # Verifier cleared — ALLOW
+        self.log_action(f"ALLOWED_{agent_id}_{action}", True)
         return {
-            "decision":   "DENY",
-            "reason":     decision.get(
-                "reason",
-                "LLM denied request"
-            ),
-            "risk_score": risk_score,
-            "agent_id":   agent_id
+            "decision":        "ALLOW",
+            "reason":          "All checks passed — verifier cleared",
+            "risk_score":      risk_score,
+            "agent_id":        agent_id,
+            "verified":        True,
+            "consensus_score": verified.consensus_score,
+            "integrity_hash":  verified.integrity_hash[:16],
         }
 
     # ── AUTO LOCKDOWN (Also called by Sentinel) ────────────

@@ -53,6 +53,44 @@ class AdversaryAgent(BaseAgent):
         name, attack_fn = random.choice(attacks)
         log_info(f"[Adversary BG] Simulating: {name}")
         attack_fn()
+        # ── Record attack in threat_intelligence DB ──────────────────────
+        try:
+            from threat_intelligence import threat_tracker
+            _type_map = {
+                "token_hijacking":      "TOKEN_HIJACKING",
+                "brute_force":          "BRUTE_FORCE",
+                "api_flooding":         "API_FLOODING",
+                "privilege_escalation": "PRIVILEGE_ESCALATION",
+            }
+            threat_tracker.record_threat(
+                threat_type     = _type_map.get(name, name.upper()),
+                agent_id        = self.agent_id,
+                flags           = [name.upper()],
+                consensus_score = 0.90,
+                metadata        = {"source": "adversary_bg", "blocked": True},
+            )
+        except Exception:
+            pass
+
+        # ── Trigger Suggestion Engine ─────────────────────────────────────
+        try:
+            from suggestion_engine import suggestion_engine
+            _type_map = {
+                "token_hijacking":      "TOKEN_HIJACKING",
+                "brute_force":          "BRUTE_FORCE",
+                "api_flooding":         "API_FLOODING",
+                "privilege_escalation": "PRIVILEGE_ESCALATION",
+            }
+            suggestion_engine.trigger({
+                "agent_id"       : self.agent_id,
+                "threat_level"   : "HIGH",
+                "flags"          : [_type_map.get(name, name.upper())],
+                "consensus_score": 0.90,
+                "action_level"   : "AUTO_BLOCK",
+                "timestamp"      : time.time(),
+            })
+        except Exception:
+            pass
 
         # Har attack ke baad Sentinel ko notify karo
         self.send_message("AGENT-ST-01", "ALERT", {
