@@ -691,7 +691,6 @@ const DashboardView = ({ onLogout, username = '', role = '' }) => {
                 { l: 'Orchestrator',   s: orchestratorData?.last_verdict || '--',                               c: orchestratorData?.last_verdict === 'SAFE' ? 'var(--accent)' : 'var(--red)' },
                 // 10 agents total
                 { l: 'Total Agents',   s: `10 AGENTS`,  c: 'var(--primary)' },
-                { l: 'Autonomous',     s: healthScore ? `${healthScore.autonomous_agents}/10` : '--',           c: 'var(--primary)' },
               ].map((st, i) => (
                 <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontFamily: 'var(--mono)' }}>
                   <span style={{ color: 'var(--text2)' }}>{st.l}</span>
@@ -775,9 +774,7 @@ const DashboardView = ({ onLogout, username = '', role = '' }) => {
                 </div>
               ))}
             </div>
-            <div style={{ color: 'var(--text3)', fontSize: '10px', fontFamily: 'var(--mono)', marginTop: '0.75rem' }}>
-              Active: {healthScore.active_agents}/5 agents &nbsp;|&nbsp; Autonomous: {healthScore.autonomous_agents}/5 agents
-            </div>
+
           </div>
         )}
 

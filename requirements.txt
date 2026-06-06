@@ -30,6 +30,6 @@ ultralytics>=8.3.27
 # Install separately AFTER cmake is installed
 # Windows: cmake.org se cmake install karo, phir: pip install liboqs-python
 # System automatically runs in FALLBACK mode if not installed
-# liboqs-python==0.11.0
+liboqs-python==0.11.0
 
 
